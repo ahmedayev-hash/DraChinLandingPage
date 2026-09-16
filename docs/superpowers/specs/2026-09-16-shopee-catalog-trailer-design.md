@@ -527,8 +527,10 @@ Modal dibuka dengan mengklik kartu drama di katalog. Isinya:
 - Judul, tahun, rating, dan sinopsis.
 - Trailer YouTube dimuat begitu modal terbuka, dengan `autoplay=1`. Tidak ada
   klik kedua. Rincian perilaku dan kemundurannya di Bagian 13.1.
-- Tombol **"TONTON FULL DI SHOPEE"** selalu terlihat. Klik memakai
-  `openAffiliate()` yang sudah ada, termasuk fallback popup-blocked.
+- Tombol **"TONTON FULL"** selalu terlihat. Labelnya sengaja tidak menyebut
+  Shopee supaya pengunjung tidak merasa dipindahkan ke toko sebelum menonton.
+  Klik memakai `openAffiliate()` yang sudah ada, termasuk fallback
+  popup-blocked.
 - Tombol tutup yang jelas di pojok.
 
 Bila `trailerKey` kosong, area trailer menampilkan poster dengan keterangan

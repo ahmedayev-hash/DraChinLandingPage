@@ -61,10 +61,11 @@ describe('TrailerModal', () => {
     expect(screen.getByText('Sinopsis drama.')).toBeInTheDocument();
   });
 
-  it('selalu menampilkan tombol Shopee', () => {
+  it('selalu menampilkan tombol tonton full', () => {
     render(<TrailerModal item={item} onClose={noop} />);
 
-    expect(screen.getByRole('button', { name: /tonton full/i })).toBeInTheDocument();
+    // Nama aksesibel diperiksa persis: label tidak boleh lagi menyebut Shopee.
+    expect(screen.getByRole('button', { name: 'TONTON FULL' })).toBeInTheDocument();
   });
 
   it('memanggil onClose saat tombol tutup diklik', async () => {
@@ -85,11 +86,11 @@ describe('TrailerModal', () => {
     expect(document.querySelector('iframe')).toBeNull();
   });
 
-  it('memanggil onWatch saat tombol Shopee diklik', async () => {
+  it('memanggil onWatch saat tombol tonton full diklik', async () => {
     const onWatch = vi.fn();
     render(<TrailerModal item={item} onClose={noop} onWatch={onWatch} />);
 
-    await userEvent.click(screen.getByRole('button', { name: /tonton full/i }));
+    await userEvent.click(screen.getByRole('button', { name: 'TONTON FULL' }));
 
     expect(onWatch).toHaveBeenCalledOnce();
   });

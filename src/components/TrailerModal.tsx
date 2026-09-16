@@ -125,7 +125,10 @@ export function TrailerModal({ item, onClose, ctaText, onWatch }: TrailerModalPr
             {item.overview !== '' && <p className="modal__overview">{item.overview}</p>}
 
             <CtaButton
-              label={ctaText ?? 'TONTON FULL DI SHOPEE'}
+              // Label sengaja tidak menyebut Shopee. Menyebut nama toko di
+              // tombol membuat pengunjung merasa akan dipindahkan ke toko
+              // sebelum menonton, sehingga tombolnya jarang diklik.
+              label={ctaText ?? 'TONTON FULL'}
               onClick={onWatch ?? noop}
             />
 

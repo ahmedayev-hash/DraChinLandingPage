@@ -17,7 +17,7 @@ Tidak ada server. Semua berkas statis.
 | Klik **LIHAT KATALOG** atau tunggu | Masuk ke katalog (riwayat di-_replace_, jadi tombol kembali tidak memicu hitungan mundur lagi) |
 | Klik kartu drama                   | Modal terbuka, URL jadi `#/drama/<id>`, trailer diputar otomatis                               |
 | Tutup modal                        | Tombol ✕, tombol Esc, klik area gelap, atau tombol kembali peramban                            |
-| Klik **TONTON FULL DI SHOPEE**     | Link affiliate dibuka di tab baru                                                              |
+| Klik **TONTON FULL**               | Link affiliate dibuka di tab baru                                                              |
 
 ## Mengganti link affiliate
 
