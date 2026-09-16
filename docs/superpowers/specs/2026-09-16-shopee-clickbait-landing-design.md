@@ -144,7 +144,7 @@ DraChinLandingPage/
 |-- tsconfig.node.json
 |-- eslint.config.js            # flat config, ESLint 10
 |-- .prettierrc.json
-|-- .gitignore                  # termasuk .env
+|-- .gitignore                  # termasuk .env, dist/, node_modules, *.tsbuildinfo
 |-- .nojekyll                   # cegah GitHub Pages memproses folder ber-underscore
 |-- .env.example                # dokumentasi: tidak ada secret client-side
 |-- src/
@@ -216,6 +216,31 @@ celah keamanan.
 - Bila `localStorage` tidak tersedia (umum di webview in-app dengan mode
   private), fallback ke pemilihan acak.
 - Mode `sequence` berguna untuk A/B test dua link Shopee.
+
+### Kendala gambar poster
+
+Poster adalah **elemen LCP** - ia yang menentukan apakah halaman terasa instan
+atau lambat. Karena pemilik proyek akan menggantinya sendiri lewat web GitHub,
+kesalahan yang paling mudah terjadi adalah mengunggah foto besar dari ponsel
+(3-8 MB), yang langsung membunuh target G1 dan merusak kesan premium.
+
+Karena itu `config.json` mendukung field opsional `posterAlt` dan aturan berikut
+didokumentasikan di `README.md`:
+
+| Aspek | Anjuran | Alasan |
+|---|---|---|
+| Rasio | 2:3 (mis. 1080x1620 px) | Rasio poster standar; mencegah crop aneh |
+| Ukuran file | **< 300 KB**, idealnya < 150 KB | Jaga LCP tetap di bawah 2.5s |
+| Format | `.webp` bila memungkinkan, jika tidak `.jpg` | WebP jauh lebih kecil pada kualitas sama |
+
+Mitigasi teknis yang wajib ada di kode, agar poster buruk tidak merusak layout:
+
+- Wadah poster memakai `aspect-ratio: 2 / 3` sehingga **ruang sudah dipesan
+  sebelum gambar dimuat** - ini yang mencegah layout shift (CLS).
+- Poster utama memakai `fetchpriority="high"` dan **tidak** `loading="lazy"`
+  (karena ia LCP).
+- `onError` pada gambar menyembunyikan gambar dan menampilkan fallback gradient,
+  sehingga poster yang salah URL tidak menghasilkan ikon gambar rusak.
 
 ## 8. Alur klik (inti konversi)
 
@@ -336,8 +361,27 @@ rusak pada hari pertama. **Keputusan: pin `typescript@5.9.3`** sampai
 
 ### Kebutuhan runtime
 
-- Node.js **>= 20.19** (mesin saat ini: Node 24.21.0 - memenuhi).
-- npm >= 10 (mesin saat ini: npm 11.19.0 - memenuhi).
+Node.js wajib **^22.12.0 || ^24.0.0 || >=26.0.0**. npm >= 10.
+
+Angka ini bukan perkiraan - ia adalah **irisan** dari engines dua package:
+
+| Package | `engines.node` |
+|---|---|
+| `vite@8.3.0` | `^20.19.0 \|\| >=22.12.0` |
+| `vitest@5.0.1` | `^22.12.0 \|\| ^24.0.0 \|\| >=26.0.0` |
+| **Irisan (yang mengikat)** | **`^22.12.0 \|\| ^24.0.0 \|\| >=26.0.0`** |
+
+> **Koreksi penting dari draft awal spec ini.** Draft awal menulis "Node >= 20.19",
+> yang hanya benar untuk Vite dan **salah untuk Vitest**. Vitest 5 menolak Node 20
+> dan Node 23/25 (versi non-LTS). Bila seseorang mengikuti angka yang salah itu
+> di mesin Node 20, `npm test` akan gagal dengan error mesin yang membingungkan.
+> Karena itu `package.json` mencantumkan field `engines` agar npm memperingatkan
+> lebih awal, bukan menyerahkan diagnosis ke error runtime.
+
+Mesin saat ini: Node 24.21.0, npm 11.19.0 - **memenuhi keduanya**.
+
+Di GitHub Actions, `actions/setup-node` di-pin ke Node **24** agar cocok dengan
+mesin pengembangan dan bukan mengandalkan default runner.
 
 ### Scripts `package.json`
 
@@ -457,8 +501,14 @@ berfungsi sebagai peringatan bagi masa depan:
 # Tidak ada variabel yang dibutuhkan saat ini.
 ```
 
-`.gitignore` mencantumkan `.env`, `.env.local`, dan `.env.*.local` sejak awal
-agar kebiasaan buruk tidak pernah terekam ke git.
+`.gitignore` mencantumkan `.env`, `.env.local`, `.env.*.local`, serta `dist/`,
+`node_modules/`, dan `*.tsbuildinfo` sejak awal agar kebiasaan buruk tidak
+pernah terekam ke git.
+
+> `*.tsbuildinfo` bukan detail sepele. Sudah diverifikasi bahwa `tsc -b`
+> menghasilkan file `tsconfig.app.tsbuildinfo` dan `tsconfig.node.tsbuildinfo`
+> di root proyek. Bila tidak di-ignore, file cache build ini ikut ter-commit dan
+> menimbulkan konflik merge yang membingungkan di kemudian hari.
 
 ### 13.4 Tindakan terhadap TMDB API key yang sudah bocor
 
@@ -490,7 +540,7 @@ langkah teknis akan ditentukan pada tahap implementation plan.
 |---|---|---|
 | 1 | `HTML.html` menjadi `archive/browser.html`, **API key distrip jadi placeholder** | Fitur lama tersimpan, tapi key tidak masuk history baru |
 | 2 | File `HTML` (tanpa ekstensi) menjadi `git rm HTML` | `git status` bersih, tidak ada lagi `deleted: HTML` |
-| 3 | Tambah `.gitignore` (termasuk `.env`, `dist/`, `node_modules`) | Repo bersih |
+| 3 | Tambah `.gitignore` (termasuk `.env`, `dist/`, `node_modules`, `*.tsbuildinfo`) | Repo bersih |
 | 4 | Tulis ulang `README.md` | Berisi cara ganti link dan cara deploy |
 | 5 | Hapus reference TMDB dari README dan proyek | Tidak ada petunjuk menuju key |
 
@@ -562,6 +612,63 @@ Bukan bagian dari pekerjaan ini, dicatat agar tidak hilang:
 | Deploy via GitHub Actions | Mencegah versi rusak sampai ke publik |
 | Link darurat ditanam di kode | Halaman tidak pernah menampilkan tombol mati |
 | API key distrip dari `archive/` | Mencegah kebocoran berulang |
+
+### 18.1 Kenapa desain ini tidak akan merepotkan di kemudian hari
+
+Pertanyaan yang diajukan pemilik proyek: *"apakah spec ini memaksimalkan agar
+future development tetap mudah dan tidak jadi pusing karena kompleksitas?"*
+
+Jawaban jujurnya: **ya, dan sebagian besar karena satu keputusan, bukan karena
+banyaknya fitur.** Penjelasannya sebagai berikut.
+
+**Total permukaan kode sengaja sangat kecil.** Produk ini memiliki 3 modul
+logika (`config.ts`, `links.ts`, `redirect.ts`), 1 komponen (`CtaButton.tsx`),
+1 halaman (`App.tsx`). Ini bukan proyek React pada umumnya - ini 1 layar dengan
+3 fungsi murni. Kecilnya permukaan kode adalah alasan utama proyek ini bisa
+ditinggalkan berbulan-bulan lalu dibuka lagi tanpa rasa pusing.
+
+**Yang sengaja TIDAK dipakai, dan alasan di baliknya:**
+
+| Tidak dipakai | Alasan |
+|---|---|
+| State management (Redux/Zustand) | Tidak ada state bersama; satu `useState` di `App.tsx` sudah cukup |
+| React Router | Satu halaman; router hanya menambah konsep tanpa manfaat |
+| CSS framework (Tailwind/MUI) | Satu file `styles.css` sudah cukup, dan menghindari kunci versi |
+| Library animasi | Animasi CSS murni; menghindari dependensi runtime tambahan |
+| Data fetching library | Satu `fetch` biasa ke `config.json` |
+| i18n | Halaman satu bahasa; YAGNI |
+
+**Tiga hal yang menjamin iterasi berikutnya tetap murah:**
+
+1. **Konten dipisah dari kode.** Mengganti headline, CTA, poster, badge, atau
+   link **tidak pernah menyentuh TypeScript**. Ini titik di mana proyek seperti
+   ini biasanya mulai menyakitkan, dan di sini justru diselesaikan lewat
+   `config.json`.
+2. **Link affiliate adalah data, bukan logika.** Menambah link ke-3, ke-4, atau
+   ke-10 cukup menambah elemen di array `links` - tidak ada kode yang berubah.
+   A/B test pun sudah tertampung lewat mode `rotation`.
+3. **TypeScript strict + test menahan regresi.** Inilah alasan desain ini
+   membayar ongkos tooling: tanpa keduanya, mengubah `redirect.ts` enam bulan
+   dari sekarang berarti menebak-nebak. Dengan test T7 dan T8, jalur klik yang
+   paling mudah rusak (dan paling mahal bila rusak) terkunci.
+
+**Yang akan benar-benar menjadi pusing, dan bagaimana menghindarinya:**
+
+| Sumber pusing di masa depan | Kapan muncul | Cara menghindarinya |
+|---|---|---|
+| Version drift (Vite/React major baru) | 6-12 bulan | Dependensi dipin ke versi minor via `package-lock.json`. **Jangan** lakukan upgrade besar tanpa menjalankan `lint` + `typecheck` + `test` (halaman 10) |
+| Kelas masalah peer dependency (seperti TS 7 vs typescript-eslint) | Saat upgrade | Selalu periksa `peerDependencies` sebelum menaikkan versi major; sudah terdokumentasi di bagian 10 |
+| Rotasi link terasa membingungkan pemilik proyek | Saat ada 2+ link | Bisa dinonaktifkan kapan saja dengan `"rotation": "sequence"` dan satu item, atau diubah ke `"random"` |
+| Konfigurasi salah ketik mematikan halaman | Kapan saja | Validasi + link darurat (bagian 9); halaman tidak pernah menampilkan tombol mati |
+| Rahasia bocor lagi lewat `.env` | Saat menambah API key | Peringatan eksplisit di `.env.example` (bagian 13.3) |
+
+**Kesimpulan jujurnya:** kompleksitas proyek ini nyaris terpusat pada satu
+baris, yaitu `config.json`. Menambah fitur di masa depan tetap murah *selama*
+fitur baru itu juga diperlakukan sebagai data. Yang akan membuat proyek ini
+sulit bukanlah React, Vite, atau jumlah file - melainkan menaruh konten kembali
+ke dalam kode. Karena itu aturan pemisahan konten dan kode (poin 1 di atas)
+adalah janji berkelanjutan yang harus dijaga, bukan sekadar detail
+implementasi.
 
 ## 19. Pertanyaan terbuka
 
