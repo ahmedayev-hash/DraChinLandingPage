@@ -1,0 +1,2414 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#090a0e">
+
+<title>DRACINMOVIE - Drama China</title>
+
+<style>
+*{box-sizing:border-box}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  margin:0;
+  background:#090a0e;
+  color:#fff;
+  font-family:Arial,Helvetica,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+
+img{
+  display:block;
+  max-width:100%;
+}
+
+button,input{
+  font:inherit;
+}
+
+button{
+  -webkit-tap-highlight-color:transparent;
+}
+
+a{
+  color:inherit;
+  text-decoration:none;
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+.header{
+  position:sticky;
+  top:0;
+  z-index:999;
+  width:100%;
+  background:rgba(9,10,14,.96);
+  border-bottom:1px solid rgba(255,255,255,.07);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+}
+
+.header-inner{
+  max-width:1280px;
+  min-height:60px;
+  margin:auto;
+  padding:9px 16px;
+  display:flex;
+  align-items:center;
+  gap:16px;
+}
+
+.logo{
+  flex:none;
+  font-size:21px;
+  font-weight:900;
+  letter-spacing:-1px;
+}
+
+.logo span{
+  color:#e50914;
+}
+
+
+/* =========================
+   SEARCH
+========================= */
+
+.search-wrap{
+  position:relative;
+  width:100%;
+  max-width:430px;
+  margin-left:auto;
+}
+
+.search-icon{
+  position:absolute;
+  left:12px;
+  top:50%;
+  transform:translateY(-50%);
+  pointer-events:none;
+  font-size:13px;
+}
+
+.search-input{
+  width:100%;
+  height:40px;
+  padding:0 12px 0 36px;
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:9px;
+  outline:none;
+  background:#17181e;
+  color:#fff;
+  font-size:12px;
+}
+
+.search-input::placeholder{
+  color:#747680;
+}
+
+.search-input:focus{
+  border-color:#e50914;
+}
+
+
+/* =========================
+   BANNER
+========================= */
+
+.ad-area{
+  max-width:1280px;
+  margin:auto;
+  padding:11px 16px 0;
+}
+
+.ad-label{
+  margin-bottom:4px;
+  text-align:center;
+  color:#62646d;
+  font-size:7px;
+  letter-spacing:1.5px;
+}
+
+.ad-banner{
+  display:block;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:9px;
+  background:#111218;
+}
+
+.ad-banner img{
+  width:100%;
+  height:110px;
+  object-fit:cover;
+}
+
+
+/* =========================
+   MAIN
+========================= */
+
+.main{
+  width:100%;
+  max-width:1280px;
+  margin:auto;
+  padding:20px 16px 45px;
+}
+
+.section-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:15px;
+}
+
+.section-title-box{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.red-line{
+  width:4px;
+  height:21px;
+  border-radius:20px;
+  background:#e50914;
+}
+
+.section-title{
+  margin:0;
+  font-size:20px;
+  font-weight:800;
+}
+
+.result-info{
+  color:#70727c;
+  font-size:9px;
+}
+
+
+/* =========================
+   GRID
+========================= */
+
+.movie-grid{
+  display:grid;
+  grid-template-columns:repeat(6,minmax(0,1fr));
+  gap:22px 14px;
+}
+
+
+/* =========================
+   CARD
+========================= */
+
+.movie-card{
+  min-width:0;
+}
+
+.poster{
+  position:relative;
+  overflow:hidden;
+  width:100%;
+  aspect-ratio:2/3;
+  border-radius:10px;
+  background:#17181e;
+  cursor:pointer;
+  box-shadow:0 8px 22px rgba(0,0,0,.25);
+}
+
+.poster img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  transition:transform .25s ease;
+}
+
+.movie-card:hover .poster img{
+  transform:scale(1.04);
+}
+
+.poster::after{
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:0;
+  z-index:1;
+  height:42%;
+  pointer-events:none;
+  background:linear-gradient(
+    transparent,
+    rgba(0,0,0,.88)
+  );
+}
+
+
+/* RATING */
+
+.rating{
+  position:absolute;
+  top:7px;
+  left:7px;
+  z-index:5;
+  padding:4px 6px;
+  border-radius:5px;
+  background:rgba(0,0,0,.82);
+  font-size:8px;
+  font-weight:800;
+}
+
+.rating-star{
+  color:#ffd43b;
+}
+
+
+/* COUNTRY */
+
+.country{
+  position:absolute;
+  top:7px;
+  right:7px;
+  z-index:5;
+  padding:4px 6px;
+  border-radius:5px;
+  background:#e50914;
+  font-size:7px;
+  font-weight:900;
+}
+
+
+/* PLAY ICON */
+
+.play-icon{
+  position:absolute;
+  left:50%;
+  top:50%;
+  z-index:5;
+
+  width:43px;
+  height:43px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding-left:3px;
+
+  transform:translate(-50%,-50%);
+
+  border-radius:50%;
+
+  background:rgba(229,9,20,.96);
+
+  box-shadow:0 8px 25px rgba(0,0,0,.45);
+
+  font-size:15px;
+
+  transition:.2s;
+}
+
+.movie-card:hover .play-icon{
+  transform:
+    translate(-50%,-50%)
+    scale(1.08);
+}
+
+
+/* TWO STEP NOTICE */
+
+.click-notice{
+  position:absolute;
+  z-index:6;
+
+  left:6px;
+  right:6px;
+  bottom:6px;
+
+  padding:5px 4px;
+
+  border-radius:5px;
+
+  background:rgba(0,0,0,.72);
+
+  color:#ddd;
+
+  text-align:center;
+
+  font-size:7px;
+  font-weight:700;
+}
+
+
+/* =========================
+   TEXT
+========================= */
+
+.movie-title{
+  margin-top:8px;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+  color:#f5f5f6;
+  font-size:12px;
+  font-weight:700;
+  line-height:1.35;
+}
+
+.movie-meta{
+  margin-top:3px;
+  color:#747680;
+  font-size:8px;
+}
+
+
+/* =========================
+   SINGLE ACTION BUTTON
+========================= */
+
+.movie-action{
+  margin-top:7px;
+}
+
+.btn-watch{
+  width:100%;
+  padding:8px 5px;
+
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:6px;
+
+  cursor:pointer;
+
+  background:#1b1c22;
+  color:#fff;
+
+  font-size:8px;
+  font-weight:800;
+
+  transition:.2s;
+}
+
+.btn-watch:hover{
+  border-color:#e50914;
+  background:#e50914;
+}
+
+
+/* =========================
+   TOAST
+========================= */
+
+.toast{
+  position:fixed;
+
+  left:50%;
+  bottom:25px;
+
+  z-index:9999;
+
+  max-width:90%;
+
+  padding:10px 15px;
+
+  transform:translateX(-50%) translateY(30px);
+
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:8px;
+
+  background:#202127;
+
+  color:#fff;
+
+  font-size:11px;
+  font-weight:700;
+
+  opacity:0;
+  pointer-events:none;
+
+  transition:.25s;
+
+  box-shadow:0 10px 30px rgba(0,0,0,.45);
+}
+
+.toast.show{
+  opacity:1;
+
+  transform:
+    translateX(-50%)
+    translateY(0);
+}
+
+
+/* =========================
+   LOAD MORE
+========================= */
+
+.load-area{
+  padding-top:30px;
+  text-align:center;
+}
+
+.load-more{
+  min-width:185px;
+
+  padding:11px 20px;
+
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:8px;
+
+  cursor:pointer;
+
+  background:#1b1c22;
+  color:#fff;
+
+  font-size:10px;
+  font-weight:800;
+}
+
+.load-more:hover{
+  background:#e50914;
+  border-color:#e50914;
+}
+
+
+/* =========================
+   PLAYER
+========================= */
+
+#player{
+  scroll-margin-top:75px;
+}
+
+.player-box{
+  margin-top:30px;
+
+  overflow:hidden;
+
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:12px;
+
+  background:#121318;
+}
+
+.player-header{
+  padding:14px;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+
+  gap:10px;
+}
+
+.player-header h2{
+  margin:0;
+  font-size:17px;
+}
+
+.close-btn{
+  flex:none;
+
+  width:32px;
+  height:32px;
+
+  border:0;
+  border-radius:50%;
+
+  cursor:pointer;
+
+  background:#292a31;
+  color:#fff;
+}
+
+.video{
+  position:relative;
+  width:100%;
+  padding-top:56.25%;
+  background:#000;
+}
+
+.video iframe{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  border:0;
+}
+
+.no-video{
+  padding:60px 15px;
+  background:#08090d;
+  color:#777984;
+  text-align:center;
+}
+
+
+/* =========================
+   DETAIL
+========================= */
+
+.detail{
+  padding:15px;
+  background:#17181e;
+}
+
+.description{
+  margin:0 0 13px;
+
+  color:#b8bac1;
+
+  font-size:11px;
+  line-height:1.65;
+}
+
+.detail-meta{
+  display:flex;
+  flex-wrap:wrap;
+
+  gap:8px 15px;
+
+  color:#858791;
+
+  font-size:9px;
+}
+
+
+/* =========================
+   LOADING
+========================= */
+
+.loading{
+  grid-column:1/-1;
+
+  padding:70px 20px;
+
+  color:#767883;
+
+  text-align:center;
+
+  font-size:11px;
+}
+
+.spinner{
+  width:32px;
+  height:32px;
+
+  margin:0 auto 12px;
+
+  border:3px solid #292a31;
+  border-top-color:#e50914;
+
+  border-radius:50%;
+
+  animation:spin .7s linear infinite;
+}
+
+@keyframes spin{
+  to{
+    transform:rotate(360deg);
+  }
+}
+
+.error{
+  grid-column:1/-1;
+  padding:55px 15px;
+  color:#888a93;
+  text-align:center;
+}
+
+
+/* =========================
+   FOOTER
+========================= */
+
+.footer{
+  padding:
+    25px
+    15px
+    calc(25px + env(safe-area-inset-bottom));
+
+  border-top:1px solid rgba(255,255,255,.06);
+
+  background:#050609;
+
+  color:#64666f;
+
+  text-align:center;
+
+  font-size:9px;
+}
+
+.footer-logo{
+  margin-bottom:5px;
+
+  color:#aaa;
+
+  font-size:13px;
+  font-weight:900;
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media(max-width:1050px){
+
+  .movie-grid{
+    grid-template-columns:
+      repeat(5,minmax(0,1fr));
+  }
+
+}
+
+@media(max-width:850px){
+
+  .movie-grid{
+    grid-template-columns:
+      repeat(4,minmax(0,1fr));
+  }
+
+}
+
+@media(max-width:680px){
+
+  .movie-grid{
+    grid-template-columns:
+      repeat(3,minmax(0,1fr));
+  }
+
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:540px){
+
+  .header-inner{
+    min-height:54px;
+    padding:8px 10px;
+    gap:9px;
+  }
+
+  .logo{
+    font-size:15px;
+    letter-spacing:-.6px;
+  }
+
+  .search-wrap{
+    min-width:0;
+  }
+
+  .search-input{
+    height:36px;
+    padding-left:32px;
+    font-size:10px;
+  }
+
+  .search-icon{
+    left:10px;
+    font-size:10px;
+  }
+
+  .ad-area{
+    padding:8px 10px 0;
+  }
+
+  .ad-banner img{
+    height:auto;
+    max-height:82px;
+  }
+
+  .main{
+    padding:17px 10px 38px;
+  }
+
+  .section-head{
+    margin-bottom:12px;
+  }
+
+  .red-line{
+    height:18px;
+  }
+
+  .section-title{
+    font-size:16px;
+  }
+
+
+  /* HP = 2 POSTER */
+
+  .movie-grid{
+    grid-template-columns:
+      repeat(2,minmax(0,1fr));
+
+    gap:19px 9px;
+  }
+
+  .poster{
+    border-radius:8px;
+  }
+
+  .play-icon{
+    width:37px;
+    height:37px;
+    font-size:12px;
+  }
+
+  .click-notice{
+    font-size:6.5px;
+  }
+
+  .movie-title{
+    margin-top:7px;
+    font-size:11px;
+  }
+
+  .movie-meta{
+    font-size:8px;
+  }
+
+  .rating{
+    top:5px;
+    left:5px;
+    font-size:7px;
+  }
+
+  .country{
+    top:5px;
+    right:5px;
+    font-size:6px;
+  }
+
+  .btn-watch{
+    padding:7px 3px;
+    font-size:7px;
+  }
+
+  .player-box{
+    margin-top:24px;
+  }
+
+  .player-header{
+    padding:10px;
+  }
+
+  .player-header h2{
+    font-size:13px;
+  }
+
+  .detail{
+    padding:11px;
+  }
+
+  .description{
+    font-size:10px;
+  }
+
+}
+
+</style>
+</head>
+
+
+<body>
+
+
+<!-- =========================
+     HEADER
+========================= -->
+
+<header class="header">
+
+  <div class="header-inner">
+
+    <div class="logo">
+      DRACIN<span>MOVIE</span>
+    </div>
+
+    <div class="search-wrap">
+
+      <span class="search-icon">
+        🔍
+      </span>
+
+      <input
+        id="searchInput"
+        class="search-input"
+        type="search"
+        placeholder="Cari dracin..."
+        autocomplete="off"
+      >
+
+    </div>
+
+  </div>
+
+</header>
+
+
+<!-- =========================
+     BANNER
+========================= -->
+
+<div class="ad-area">
+
+  <div class="ad-label">
+    SPONSOR
+  </div>
+
+  <a
+    class="ad-banner"
+    href="https://s.shopee.co.id/9peLe2gVIP?share_channel_code=1"
+    target="_blank"
+    rel="noopener noreferrer sponsored"
+  >
+
+    <img
+      src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjso_ROPofa-PurnwuLft47YyYvLOJafe22psMSb56ZfurS72_PSxKm9uclnsZNQrkSDLFqVet4OwGXqOamPJSE6e3ql2rfUpE_UfH4ecMvLlGZ0w5AsLZ7o5kMCHKgFPBAXESBnvQLlDQcPZ5Se_46pH9rocP6YzIPLUc6bh8QczQN5mYcVl4xEfTZJVh5/s1365/Made_for_300_202512091047.jpeg"
+      alt="Sponsor"
+    >
+
+  </a>
+
+</div>
+
+
+<!-- =========================
+     MAIN
+========================= -->
+
+<main class="main">
+
+
+  <div class="section-head">
+
+    <div class="section-title-box">
+
+      <span class="red-line"></span>
+
+      <h1
+        id="sectionTitle"
+        class="section-title"
+      >
+        Dracin Populer
+      </h1>
+
+    </div>
+
+
+    <span
+      id="resultInfo"
+      class="result-info"
+    >
+      Memuat...
+    </span>
+
+  </div>
+
+
+  <div
+    id="movieGrid"
+    class="movie-grid"
+  >
+
+    <div class="loading">
+
+      <div class="spinner"></div>
+
+      Memuat drama China...
+
+    </div>
+
+  </div>
+
+
+  <div
+    id="loadArea"
+    class="load-area"
+    style="display:none"
+  >
+
+    <button
+      id="loadMore"
+      class="load-more"
+      type="button"
+    >
+      MUAT LEBIH BANYAK
+    </button>
+
+  </div>
+
+
+  <div id="player"></div>
+
+
+</main>
+
+
+<!-- TOAST -->
+
+<div
+  id="toast"
+  class="toast"
+>
+  Sponsor sudah dibuka. Klik sekali lagi untuk trailer.
+</div>
+
+
+<!-- FOOTER -->
+
+<footer class="footer">
+
+  <div class="footer-logo">
+
+    DRACIN<span style="color:#e50914">
+      MOVIE
+    </span>
+
+  </div>
+
+  SELAMAT MENONTON
+
+</footer>
+
+
+<script>
+
+/* =====================================================
+   CONFIG
+===================================================== */
+
+const API_KEY =
+  "REDACTED_TMDB_API_KEY";
+
+const BASE_URL =
+  "https://api.themoviedb.org/3";
+
+const IMG_URL =
+  "https://image.tmdb.org/t/p/w500";
+
+
+/*
+  Klik sponsor akan bergantian:
+
+  Klik sponsor #1 = CPM
+  Klik sponsor #2 = Shopee
+  Klik sponsor #3 = CPM
+  dst.
+*/
+
+const CPM_URL =
+  "https://www.profitableratecpmnetwork.com/gf1teu3z?key=6c1f06f266d4061bbd5f98e2e447766a";
+
+const SHOPEE_URL =
+  "https://s.shopee.co.id/9peLe2gVIP?share_channel_code=1";
+
+
+/* =====================================================
+   ELEMENTS
+===================================================== */
+
+const movieGrid =
+  document.getElementById("movieGrid");
+
+const player =
+  document.getElementById("player");
+
+const loadArea =
+  document.getElementById("loadArea");
+
+const loadMore =
+  document.getElementById("loadMore");
+
+const searchInput =
+  document.getElementById("searchInput");
+
+const sectionTitle =
+  document.getElementById("sectionTitle");
+
+const resultInfo =
+  document.getElementById("resultInfo");
+
+const toast =
+  document.getElementById("toast");
+
+
+/* =====================================================
+   STATE
+===================================================== */
+
+let currentPage = 1;
+
+let totalPages = 1;
+
+let currentMode =
+  "popular";
+
+let currentSearch =
+  "";
+
+let searchTimer =
+  null;
+
+let loading =
+  false;
+
+let sponsorIndex =
+  0;
+
+
+/*
+  Menyimpan status klik per film.
+
+  false / belum ada =
+  klik berikutnya sponsor.
+
+  true =
+  sponsor sudah diklik,
+  klik berikutnya trailer.
+*/
+
+const movieClickState = {};
+
+
+/* =====================================================
+   ESCAPE
+===================================================== */
+
+function escapeHTML(value){
+
+  return String(value ?? "")
+  .replace(
+    /[&<>"']/g,
+    function(c){
+
+      const map = {
+
+        "&":"&amp;",
+
+        "<":"&lt;",
+
+        ">":"&gt;",
+
+        '"':"&quot;",
+
+        "'":"&#039;"
+
+      };
+
+      return map[c];
+
+    }
+  );
+
+}
+
+
+/* =====================================================
+   TOAST
+===================================================== */
+
+let toastTimer = null;
+
+function showToast(message){
+
+  clearTimeout(
+    toastTimer
+  );
+
+  toast.textContent =
+    message;
+
+  toast.classList.add(
+    "show"
+  );
+
+  toastTimer =
+    setTimeout(
+      function(){
+
+        toast.classList.remove(
+          "show"
+        );
+
+      },
+      2600
+    );
+
+}
+
+
+/* =====================================================
+   OPEN SPONSOR
+===================================================== */
+
+function openSponsor(){
+
+  const links = [
+
+    CPM_URL,
+
+    SHOPEE_URL
+
+  ];
+
+
+  const url =
+    links[
+      sponsorIndex %
+      links.length
+    ];
+
+
+  sponsorIndex++;
+
+
+  window.open(
+    url,
+    "_blank",
+    "noopener,noreferrer"
+  );
+
+}
+
+
+/* =====================================================
+   TWO-STEP CLICK
+===================================================== */
+
+function handleMovieClick(id){
+
+  /*
+    KLIK PERTAMA
+    = SPONSOR
+  */
+
+  if(!movieClickState[id]){
+
+    movieClickState[id] =
+      true;
+
+    openSponsor();
+
+    showToast(
+      "Sponsor dibuka • klik sekali lagi untuk memutar trailer"
+    );
+
+    return;
+
+  }
+
+
+  /*
+    KLIK KEDUA
+    = TRAILER
+  */
+
+  movieClickState[id] =
+    false;
+
+  showMovieDetails(id);
+
+}
+
+
+/* =====================================================
+   LOADING
+===================================================== */
+
+function showLoading(){
+
+  movieGrid.innerHTML = `
+
+    <div class="loading">
+
+      <div class="spinner"></div>
+
+      Memuat drama China...
+
+    </div>
+
+  `;
+
+}
+
+
+/* =====================================================
+   POPULAR URL
+===================================================== */
+
+function popularURL(page){
+
+  const params =
+    new URLSearchParams({
+
+      api_key:
+        API_KEY,
+
+      language:
+        "id-ID",
+
+      with_origin_country:
+        "CN",
+
+      with_original_language:
+        "zh",
+
+      sort_by:
+        "popularity.desc",
+
+      include_adult:
+        "false",
+
+      include_null_first_air_dates:
+        "false",
+
+      "vote_count.gte":
+        "5",
+
+      page:
+        String(page)
+
+    });
+
+
+  return (
+
+    BASE_URL +
+
+    "/discover/tv?" +
+
+    params.toString()
+
+  );
+
+}
+
+
+/* =====================================================
+   FETCH MOVIES
+===================================================== */
+
+async function fetchMovies(
+  page = 1,
+  append = false
+){
+
+  if(loading){
+    return;
+  }
+
+
+  loading = true;
+
+
+  if(!append){
+
+    showLoading();
+
+  }
+
+
+  try{
+
+
+    const response =
+      await fetch(
+        popularURL(page)
+      );
+
+
+    if(!response.ok){
+
+      throw new Error(
+        "HTTP " +
+        response.status
+      );
+
+    }
+
+
+    const data =
+      await response.json();
+
+
+    totalPages =
+      Number(
+        data.total_pages ||
+        1
+      );
+
+
+    displayMovies(
+      data.results || [],
+      append
+    );
+
+
+    sectionTitle.textContent =
+      "Dracin Populer";
+
+
+    resultInfo.textContent =
+      "Halaman " +
+      page;
+
+
+    loadArea.style.display =
+
+      page < totalPages
+
+      ? "block"
+
+      : "none";
+
+
+  }catch(error){
+
+
+    console.error(error);
+
+
+    if(!append){
+
+      movieGrid.innerHTML = `
+
+        <div class="error">
+
+          Drama gagal dimuat.
+
+          <br><br>
+
+          <button
+            class="load-more"
+            onclick="location.reload()"
+          >
+            COBA LAGI
+          </button>
+
+        </div>
+
+      `;
+
+    }
+
+
+    resultInfo.textContent =
+      "Gagal memuat";
+
+
+  }finally{
+
+    loading = false;
+
+  }
+
+}
+
+
+/* =====================================================
+   DISPLAY MOVIES
+===================================================== */
+
+function displayMovies(
+  movies,
+  append = false
+){
+
+  let html = "";
+
+
+  movies.forEach(
+    function(movie){
+
+
+      const id =
+        Number(movie.id);
+
+
+      const title =
+
+        movie.name ||
+
+        movie.original_name ||
+
+        "Tanpa Judul";
+
+
+      const safeTitle =
+        escapeHTML(title);
+
+
+      const poster =
+
+        movie.poster_path
+
+        ? IMG_URL +
+          movie.poster_path
+
+        : "";
+
+
+      const year =
+
+        movie.first_air_date
+
+        ? String(
+            movie.first_air_date
+          ).substring(
+            0,
+            4
+          )
+
+        : "-";
+
+
+      const rating =
+
+        typeof movie.vote_average ===
+        "number"
+
+        ? movie.vote_average
+            .toFixed(1)
+
+        : "-";
+
+
+      html += `
+
+        <article class="movie-card">
+
+
+          <div
+            class="poster"
+            onclick="handleMovieClick(${id})"
+          >
+
+
+            ${
+              poster
+
+              ? `
+
+                <img
+                  src="${escapeHTML(poster)}"
+                  alt="${safeTitle}"
+                  loading="lazy"
+                >
+
+              `
+
+              : `
+
+                <div style="
+                  width:100%;
+                  height:100%;
+                  display:flex;
+                  align-items:center;
+                  justify-content:center;
+                  padding:15px;
+                  color:#777;
+                  text-align:center;
+                  font-size:11px;
+                ">
+
+                  ${safeTitle}
+
+                </div>
+
+              `
+            }
+
+
+            <span class="rating">
+
+              <span class="rating-star">
+                ★
+              </span>
+
+              ${escapeHTML(rating)}
+
+            </span>
+
+
+            <span class="country">
+              CN
+            </span>
+
+
+            <span class="play-icon">
+              ▶
+            </span>
+
+
+            <span class="click-notice">
+
+              KLIK 1 SPONSOR · KLIK 2 TRAILER
+
+            </span>
+
+
+          </div>
+
+
+          <div
+            class="movie-title"
+            title="${safeTitle}"
+          >
+
+            ${safeTitle}
+
+          </div>
+
+
+          <div class="movie-meta">
+
+            ${escapeHTML(year)}
+            · Drama China
+
+          </div>
+
+
+          <div class="movie-action">
+
+            <button
+              class="btn-watch"
+              type="button"
+              onclick="handleMovieClick(${id})"
+            >
+
+              ▶ BUKA TRAILER
+
+            </button>
+
+          </div>
+
+
+        </article>
+
+      `;
+
+    }
+  );
+
+
+  if(append){
+
+    movieGrid.insertAdjacentHTML(
+      "beforeend",
+      html
+    );
+
+  }else{
+
+    movieGrid.innerHTML =
+
+      html ||
+
+      `
+
+        <div class="error">
+
+          Drama tidak ditemukan.
+
+        </div>
+
+      `;
+
+  }
+
+}
+
+
+/* =====================================================
+   LOAD MORE
+===================================================== */
+
+loadMore.addEventListener(
+  "click",
+  function(){
+
+
+    if(loading){
+      return;
+    }
+
+
+    if(
+      currentPage >=
+      totalPages
+    ){
+      return;
+    }
+
+
+    currentPage++;
+
+
+    if(
+      currentMode ===
+      "popular"
+    ){
+
+      fetchMovies(
+        currentPage,
+        true
+      );
+
+    }else{
+
+      searchMovies(
+        currentSearch,
+        currentPage,
+        true
+      );
+
+    }
+
+  }
+);
+
+
+/* =====================================================
+   SEARCH
+===================================================== */
+
+searchInput.addEventListener(
+  "input",
+  function(){
+
+
+    const query =
+      this.value.trim();
+
+
+    clearTimeout(
+      searchTimer
+    );
+
+
+    searchTimer =
+      setTimeout(
+        function(){
+
+
+          if(query === ""){
+
+
+            currentMode =
+              "popular";
+
+
+            currentPage =
+              1;
+
+
+            currentSearch =
+              "";
+
+
+            fetchMovies(
+              1,
+              false
+            );
+
+
+            return;
+
+          }
+
+
+          if(
+            query.length >=
+            2
+          ){
+
+
+            currentMode =
+              "search";
+
+
+            currentPage =
+              1;
+
+
+            currentSearch =
+              query;
+
+
+            searchMovies(
+              query,
+              1,
+              false
+            );
+
+          }
+
+
+        },
+        350
+      );
+
+  }
+);
+
+
+/* =====================================================
+   SEARCH API
+===================================================== */
+
+async function searchMovies(
+  query,
+  page = 1,
+  append = false
+){
+
+  if(loading){
+    return;
+  }
+
+
+  loading = true;
+
+
+  if(!append){
+
+    showLoading();
+
+  }
+
+
+  try{
+
+
+    const params =
+      new URLSearchParams({
+
+        api_key:
+          API_KEY,
+
+        language:
+          "id-ID",
+
+        query:
+          query,
+
+        include_adult:
+          "false",
+
+        page:
+          String(page)
+
+      });
+
+
+    const response =
+      await fetch(
+
+        BASE_URL +
+
+        "/search/tv?" +
+
+        params.toString()
+
+      );
+
+
+    if(!response.ok){
+
+      throw new Error(
+        "Search gagal"
+      );
+
+    }
+
+
+    const data =
+      await response.json();
+
+
+    const chineseDrama =
+
+      (data.results || [])
+
+      .filter(
+        function(item){
+
+
+          const countries =
+            item.origin_country ||
+            [];
+
+
+          return (
+
+            countries.includes(
+              "CN"
+            )
+
+            ||
+
+            item.original_language ===
+            "zh"
+
+          );
+
+        }
+      );
+
+
+    totalPages =
+      Number(
+        data.total_pages ||
+        1
+      );
+
+
+    displayMovies(
+      chineseDrama,
+      append
+    );
+
+
+    sectionTitle.textContent =
+      'Hasil: "' +
+      query +
+      '"';
+
+
+    resultInfo.textContent =
+      "Halaman " +
+      page;
+
+
+    loadArea.style.display =
+
+      page < totalPages
+
+      ? "block"
+
+      : "none";
+
+
+  }catch(error){
+
+
+    console.error(error);
+
+
+    if(!append){
+
+      movieGrid.innerHTML = `
+
+        <div class="error">
+
+          Pencarian gagal.
+
+        </div>
+
+      `;
+
+    }
+
+
+  }finally{
+
+    loading = false;
+
+  }
+
+}
+
+
+/* =====================================================
+   DETAIL
+===================================================== */
+
+async function getDetails(id){
+
+  const params =
+    new URLSearchParams({
+
+      api_key:
+        API_KEY,
+
+      language:
+        "id-ID"
+
+    });
+
+
+  const response =
+    await fetch(
+
+      BASE_URL +
+
+      "/tv/" +
+
+      encodeURIComponent(id) +
+
+      "?" +
+
+      params.toString()
+
+    );
+
+
+  if(!response.ok){
+
+    throw new Error(
+      "Detail gagal"
+    );
+
+  }
+
+
+  return response.json();
+
+}
+
+
+/* =====================================================
+   TRAILER
+===================================================== */
+
+async function getTrailer(id){
+
+  try{
+
+
+    const params =
+      new URLSearchParams({
+
+        api_key:
+          API_KEY
+
+      });
+
+
+    const response =
+      await fetch(
+
+        BASE_URL +
+
+        "/tv/" +
+
+        encodeURIComponent(id) +
+
+        "/videos?" +
+
+        params.toString()
+
+      );
+
+
+    if(!response.ok){
+
+      return null;
+
+    }
+
+
+    const data =
+      await response.json();
+
+
+    const videos =
+      data.results ||
+      [];
+
+
+    let trailer =
+
+      videos.find(
+        function(video){
+
+          return (
+
+            video.site ===
+            "YouTube"
+
+            &&
+
+            video.type ===
+            "Trailer"
+
+            &&
+
+            video.official ===
+            true
+
+          );
+
+        }
+      );
+
+
+    if(!trailer){
+
+      trailer =
+
+        videos.find(
+          function(video){
+
+            return (
+
+              video.site ===
+              "YouTube"
+
+              &&
+
+              video.type ===
+              "Trailer"
+
+            );
+
+          }
+        );
+
+    }
+
+
+    if(!trailer){
+
+      trailer =
+
+        videos.find(
+          function(video){
+
+            return (
+
+              video.site ===
+              "YouTube"
+
+            );
+
+          }
+        );
+
+    }
+
+
+    return trailer
+
+      ? trailer.key
+
+      : null;
+
+
+  }catch(error){
+
+
+    console.error(error);
+
+
+    return null;
+
+  }
+
+}
+
+
+/* =====================================================
+   SHOW MOVIE
+===================================================== */
+
+async function showMovieDetails(id){
+
+
+  player.innerHTML = `
+
+    <section class="player-box">
+
+      <div class="loading">
+
+        <div class="spinner"></div>
+
+        Memuat trailer...
+
+      </div>
+
+    </section>
+
+  `;
+
+
+  player.scrollIntoView({
+
+    behavior:
+      "smooth",
+
+    block:
+      "start"
+
+  });
+
+
+  try{
+
+
+    const results =
+      await Promise.all([
+
+        getDetails(id),
+
+        getTrailer(id)
+
+      ]);
+
+
+    const movie =
+      results[0];
+
+
+    const trailer =
+      results[1];
+
+
+    const title =
+
+      movie.name ||
+
+      movie.original_name ||
+
+      "Drama China";
+
+
+    const description =
+
+      movie.overview ||
+
+      "Deskripsi belum tersedia.";
+
+
+    const date =
+
+      movie.first_air_date ||
+
+      "-";
+
+
+    const rating =
+
+      typeof movie.vote_average ===
+      "number"
+
+      ? movie.vote_average
+          .toFixed(1)
+
+      : "-";
+
+
+    const seasons =
+      movie.number_of_seasons ||
+      "-";
+
+
+    const episodes =
+      movie.number_of_episodes ||
+      "-";
+
+
+    let videoHTML;
+
+
+    if(trailer){
+
+
+      videoHTML = `
+
+        <div class="video">
+
+          <iframe
+
+            src="https://www.youtube.com/embed/${encodeURIComponent(trailer)}"
+
+            title="Trailer ${escapeHTML(title)}"
+
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+
+            allowfullscreen
+
+          ></iframe>
+
+        </div>
+
+      `;
+
+
+    }else{
+
+
+      videoHTML = `
+
+        <div class="no-video">
+
+          🎬
+
+          <br><br>
+
+          Trailer belum tersedia.
+
+        </div>
+
+      `;
+
+    }
+
+
+    player.innerHTML = `
+
+      <section class="player-box">
+
+
+        <div class="player-header">
+
+
+          <h2>
+
+            ${escapeHTML(title)}
+
+          </h2>
+
+
+          <button
+
+            class="close-btn"
+
+            type="button"
+
+            onclick="closePlayer()"
+
+          >
+
+            ✕
+
+          </button>
+
+
+        </div>
+
+
+        ${videoHTML}
+
+
+        <div class="detail">
+
+
+          <p class="description">
+
+            ${escapeHTML(description)}
+
+          </p>
+
+
+          <div class="detail-meta">
+
+
+            <span>
+
+              📅
+              ${escapeHTML(date)}
+
+            </span>
+
+
+            <span>
+
+              ⭐
+              ${escapeHTML(rating)}
+
+            </span>
+
+
+            <span>
+
+              📺
+              ${escapeHTML(seasons)}
+              Season
+
+            </span>
+
+
+            <span>
+
+              🎞
+              ${escapeHTML(episodes)}
+              Episode
+
+            </span>
+
+
+          </div>
+
+
+        </div>
+
+
+      </section>
+
+    `;
+
+
+  }catch(error){
+
+
+    console.error(error);
+
+
+    player.innerHTML = `
+
+      <section class="player-box">
+
+        <div class="no-video">
+
+          Gagal memuat drama.
+
+        </div>
+
+      </section>
+
+    `;
+
+  }
+
+}
+
+
+/* =====================================================
+   CLOSE PLAYER
+===================================================== */
+
+function closePlayer(){
+
+  player.innerHTML =
+    "";
+
+}
+
+
+/* =====================================================
+   START
+===================================================== */
+
+fetchMovies(
+  1,
+  false
+);
+
+</script>
+
+</body>
+</html>
