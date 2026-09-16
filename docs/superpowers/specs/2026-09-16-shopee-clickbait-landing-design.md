@@ -1,10 +1,10 @@
 # Landing Page Clickbait Shopee Affiliate - Design
 
-| | |
-|---|---|
-| **Tanggal** | 16 September 2026 |
-| **Status** | Disetujui, siap masuk tahap implementation plan |
-| **Repo** | `ahmedayev-hash/DraChinLandingPage` (public, GitHub Pages) |
+|               |                                                                        |
+| ------------- | ---------------------------------------------------------------------- |
+| **Tanggal**   | 16 September 2026                                                      |
+| **Status**    | Disetujui, siap masuk tahap implementation plan                        |
+| **Repo**      | `ahmedayev-hash/DraChinLandingPage` (public, GitHub Pages)             |
 | **Path spec** | `docs/superpowers/specs/2026-09-16-shopee-clickbait-landing-design.md` |
 
 ## 1. Ringkasan
@@ -33,7 +33,7 @@ Target deploy: **GitHub Pages** (static hosting, tanpa server).
 
 - `HTML.html` - 2414 baris, satu file berisi HTML + CSS + JS inline.
 - Fitur: grid drama dari TMDB API, pencarian, load-more, player trailer YouTube,
-  dan logika *two-step click* (klik 1 menjadi sponsor CPM/Shopee bergantian,
+  dan logika _two-step click_ (klik 1 menjadi sponsor CPM/Shopee bergantian,
   klik 2 menjadi trailer).
 - `README.md` - hanya satu baris deskripsi.
 - File `HTML` (tanpa ekstensi) - ke-track git tapi sudah hilang dari working tree
@@ -42,13 +42,13 @@ Target deploy: **GitHub Pages** (static hosting, tanpa server).
 
 ### Masalah
 
-| # | Masalah | Dampak |
-|---|---|---|
-| M1 | Fitur drama/TMDB adalah mesin traffic, bukan mesin konversi. Untuk affiliate murni, kompleksitasnya tidak terbayar. | Halaman berat, banyak titik gagal |
-| M2 | Mengganti link affiliate berarti mengedit JS inline di file 2414 baris. | Rawan salah, lambat, butuh terminal |
-| M3 | API key TMDB publik dan masih aktif. | Risiko penyalahgunaan kuota |
-| M4 | Tidak ada tooling: tanpa lint, typecheck, test, atau build. | Refactor berbahaya, bug tidak terdeteksi |
-| M5 | Tidak ada mekanisme anti-popup-block. | Klik hilang diam-diam di in-app browser |
+| #   | Masalah                                                                                                             | Dampak                                   |
+| --- | ------------------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
+| M1  | Fitur drama/TMDB adalah mesin traffic, bukan mesin konversi. Untuk affiliate murni, kompleksitasnya tidak terbayar. | Halaman berat, banyak titik gagal        |
+| M2  | Mengganti link affiliate berarti mengedit JS inline di file 2414 baris.                                             | Rawan salah, lambat, butuh terminal      |
+| M3  | API key TMDB publik dan masih aktif.                                                                                | Risiko penyalahgunaan kuota              |
+| M4  | Tidak ada tooling: tanpa lint, typecheck, test, atau build.                                                         | Refactor berbahaya, bug tidak terdeteksi |
+| M5  | Tidak ada mekanisme anti-popup-block.                                                                               | Klik hilang diam-diam di in-app browser  |
 
 ### Kebutuhan eksplisit dari pemilik proyek
 
@@ -62,14 +62,14 @@ Target deploy: **GitHub Pages** (static hosting, tanpa server).
 
 ## 3. Tujuan
 
-| # | Tujuan | Ukuran keberhasilan |
-|---|---|---|
-| G1 | Halaman clickbait premium yang meyakinkan di mobile | LCP < 2.5s di 4G; tidak ada layout shift |
-| G2 | Klik membuka Shopee di tab baru | Setiap klik membuka Shopee, termasuk saat popup diblokir |
-| G3 | Link bisa diganti tanpa terminal dan tanpa build manual | Edit 1 file di web GitHub, commit, live |
-| G4 | Tooling berkualitas | `lint`, `typecheck`, `test`, `build` semua hijau |
-| G5 | Bebas rahasia di dalam bundle | Tidak ada API key di repo maupun di `dist/` |
-| G6 | Aman saat gonta-ganti domain | Semua aset dan config pakai path relatif |
+| #   | Tujuan                                                  | Ukuran keberhasilan                                      |
+| --- | ------------------------------------------------------- | -------------------------------------------------------- |
+| G1  | Halaman clickbait premium yang meyakinkan di mobile     | LCP < 2.5s di 4G; tidak ada layout shift                 |
+| G2  | Klik membuka Shopee di tab baru                         | Setiap klik membuka Shopee, termasuk saat popup diblokir |
+| G3  | Link bisa diganti tanpa terminal dan tanpa build manual | Edit 1 file di web GitHub, commit, live                  |
+| G4  | Tooling berkualitas                                     | `lint`, `typecheck`, `test`, `build` semua hijau         |
+| G5  | Bebas rahasia di dalam bundle                           | Tidak ada API key di repo maupun di `dist/`              |
+| G6  | Aman saat gonta-ganti domain                            | Semua aset dan config pakai path relatif                 |
 
 ## 4. Non-tujuan
 
@@ -193,18 +193,18 @@ DraChinLandingPage/
 
   // "sequence" = bergantian tiap kunjungan (A/B test)
   // "random"   = acak merata
-  "rotation": "sequence"
+  "rotation": "sequence",
 }
 ```
 
 ### Aturan validasi
 
-| Field | Aturan | Jika tidak valid |
-|---|---|---|
-| `links` | Array, minimal 1, setiap item lolos `new URL()` dengan protokol `http:`/`https:` | Item tidak valid dibuang; bila kosong menjadi pakai link darurat |
-| `headline`, `subheadline`, `ctaText` | String non-kosong | Pakai nilai default |
-| `poster` | String; bila gagal dimuat maka skeleton disembunyikan | Fallback ke placeholder CSS |
-| `rotation` | `"sequence"` atau `"random"` | Default `"sequence"` |
+| Field                                | Aturan                                                                           | Jika tidak valid                                                 |
+| ------------------------------------ | -------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| `links`                              | Array, minimal 1, setiap item lolos `new URL()` dengan protokol `http:`/`https:` | Item tidak valid dibuang; bila kosong menjadi pakai link darurat |
+| `headline`, `subheadline`, `ctaText` | String non-kosong                                                                | Pakai nilai default                                              |
+| `poster`                             | String; bila gagal dimuat maka skeleton disembunyikan                            | Fallback ke placeholder CSS                                      |
+| `rotation`                           | `"sequence"` atau `"random"`                                                     | Default `"sequence"`                                             |
 
 **Validasi protokol itu wajib.** Hanya `http:`/`https:` yang diterima; skema
 lain (`javascript:`, `data:`) ditolak. Ini mencegah salah konfigurasi menjadi
@@ -227,11 +227,11 @@ kesalahan yang paling mudah terjadi adalah mengunggah foto besar dari ponsel
 Karena itu `config.json` mendukung field opsional `posterAlt` dan aturan berikut
 didokumentasikan di `README.md`:
 
-| Aspek | Anjuran | Alasan |
-|---|---|---|
-| Rasio | 2:3 (mis. 1080x1620 px) | Rasio poster standar; mencegah crop aneh |
-| Ukuran file | **< 300 KB**, idealnya < 150 KB | Jaga LCP tetap di bawah 2.5s |
-| Format | `.webp` bila memungkinkan, jika tidak `.jpg` | WebP jauh lebih kecil pada kualitas sama |
+| Aspek       | Anjuran                                      | Alasan                                   |
+| ----------- | -------------------------------------------- | ---------------------------------------- |
+| Rasio       | 2:3 (mis. 1080x1620 px)                      | Rasio poster standar; mencegah crop aneh |
+| Ukuran file | **< 300 KB**, idealnya < 150 KB              | Jaga LCP tetap di bawah 2.5s             |
+| Format      | `.webp` bila memungkinkan, jika tidak `.jpg` | WebP jauh lebih kecil pada kualitas sama |
 
 Mitigasi teknis yang wajib ada di kode, agar poster buruk tidak merusak layout:
 
@@ -279,7 +279,7 @@ Maka implementasi yang benar:
 ```ts
 // src/lib/redirect.ts
 export function openAffiliate(url: string): void {
-  const win = window.open(url, "_blank");
+  const win = window.open(url, '_blank');
 
   if (win) {
     // Setara dengan noopener, tapi kita tetap mendapatkan return value
@@ -308,13 +308,13 @@ pernah terbuka, dan pemilik proyek **tidak akan pernah tahu** kliknya hilang.
 
 ## 9. Penanganan error
 
-| Skenario | Perilaku |
-|---|---|
+| Skenario                                                  | Perilaku                                                                                            |
+| --------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
 | `config.json` gagal di-fetch (404 / offline / JSON rusak) | Pakai **link darurat** yang ditanam di `config.ts`; halaman tetap tampil dan tombol tetap berfungsi |
-| `config.json` valid tapi `links` kosong | Sama seperti di atas - link darurat |
-| Gambar poster gagal dimuat | Skeleton disembunyikan, fallback ke background gradient |
-| Popup diblokir | `window.location.href` (lihat bagian 8) |
-| `localStorage` tidak tersedia | Fallback ke pemilihan link acak |
+| `config.json` valid tapi `links` kosong                   | Sama seperti di atas - link darurat                                                                 |
+| Gambar poster gagal dimuat                                | Skeleton disembunyikan, fallback ke background gradient                                             |
+| Popup diblokir                                            | `window.location.href` (lihat bagian 8)                                                             |
+| `localStorage` tidak tersedia                             | Fallback ke pemilihan link acak                                                                     |
 
 **Prinsip:** halaman **tidak boleh pernah** menampilkan tombol mati atau layar
 error total. Selalu ada jalur yang bisa diklik.
@@ -327,23 +327,23 @@ error total. Selalu ada jalur yang bisa diklik.
 
 Versi berikut **diverifikasi langsung dari registry npm pada 16 Sep 2026**.
 
-| Package | Versi | Peran |
-|---|---|---|
-| `react` | 19.3.0 | UI |
-| `react-dom` | 19.3.0 | Renderer |
-| `vite` | 8.3.0 | Build tool + dev server |
-| `@vitejs/plugin-react` | 6.1.1 | Fast refresh React |
-| **`typescript`** | **5.9.3** | **Dipin, lihat catatan** |
-| `vitest` | 5.0.1 | Test runner |
-| `jsdom` | 30.0.1 | Environment DOM untuk test |
-| `@testing-library/react` | 16.3.3 | Test komponen |
-| `@testing-library/jest-dom` | 7.0.1 | Matcher DOM |
-| `eslint` | 10.10.0 | Linter |
-| `typescript-eslint` | 8.70.0 | Aturan TS untuk ESLint |
-| `prettier` | 3.9.6 | Formatter |
-| `@types/react` | 19.3.0 | Tipe React |
-| `@types/react-dom` | 19.3.0 | Tipe React DOM |
-| `@types/node` | 22.20.3 | Tipe Node (untuk config Vite) |
+| Package                     | Versi     | Peran                         |
+| --------------------------- | --------- | ----------------------------- |
+| `react`                     | 19.3.0    | UI                            |
+| `react-dom`                 | 19.3.0    | Renderer                      |
+| `vite`                      | 8.3.0     | Build tool + dev server       |
+| `@vitejs/plugin-react`      | 6.1.1     | Fast refresh React            |
+| **`typescript`**            | **5.9.3** | **Dipin, lihat catatan**      |
+| `vitest`                    | 5.0.1     | Test runner                   |
+| `jsdom`                     | 30.0.1    | Environment DOM untuk test    |
+| `@testing-library/react`    | 16.3.3    | Test komponen                 |
+| `@testing-library/jest-dom` | 7.0.1     | Matcher DOM                   |
+| `eslint`                    | 10.10.0   | Linter                        |
+| `typescript-eslint`         | 8.70.0    | Aturan TS untuk ESLint        |
+| `prettier`                  | 3.9.6     | Formatter                     |
+| `@types/react`              | 19.3.0    | Tipe React                    |
+| `@types/react-dom`          | 19.3.0    | Tipe React DOM                |
+| `@types/node`               | 22.20.3   | Tipe Node (untuk config Vite) |
 
 ### TypeScript sengaja dipin di 5.9.3, bukan 7.0.2
 
@@ -365,10 +365,10 @@ Node.js wajib **^22.12.0 || ^24.0.0 || >=26.0.0**. npm >= 10.
 
 Angka ini bukan perkiraan - ia adalah **irisan** dari engines dua package:
 
-| Package | `engines.node` |
-|---|---|
-| `vite@8.3.0` | `^20.19.0 \|\| >=22.12.0` |
-| `vitest@5.0.1` | `^22.12.0 \|\| ^24.0.0 \|\| >=26.0.0` |
+| Package                    | `engines.node`                            |
+| -------------------------- | ----------------------------------------- |
+| `vite@8.3.0`               | `^20.19.0 \|\| >=22.12.0`                 |
+| `vitest@5.0.1`             | `^22.12.0 \|\| ^24.0.0 \|\| >=26.0.0`     |
 | **Irisan (yang mengikat)** | **`^22.12.0 \|\| ^24.0.0 \|\| >=26.0.0`** |
 
 > **Koreksi penting dari draft awal spec ini.** Draft awal menulis "Node >= 20.19",
@@ -385,17 +385,17 @@ mesin pengembangan dan bukan mengandalkan default runner.
 
 ### Scripts `package.json`
 
-| Script | Perintah |
-|---|---|
-| `dev` | `vite` |
-| `build` | `tsc -b && vite build` |
-| `preview` | `vite preview` |
-| `lint` | `eslint .` |
-| `typecheck` | `tsc -b --noEmit` |
-| `format` | `prettier --write .` |
-| `format:check` | `prettier --check .` |
-| `test` | `vitest run` |
-| `test:watch` | `vitest` |
+| Script         | Perintah               |
+| -------------- | ---------------------- |
+| `dev`          | `vite`                 |
+| `build`        | `tsc -b && vite build` |
+| `preview`      | `vite preview`         |
+| `lint`         | `eslint .`             |
+| `typecheck`    | `tsc -b --noEmit`      |
+| `format`       | `prettier --write .`   |
+| `format:check` | `prettier --check .`   |
+| `test`         | `vitest run`           |
+| `test:watch`   | `vitest`               |
 
 ### TypeScript strict
 
@@ -408,18 +408,18 @@ berguna, jadi tidak dilonggarkan.
 Fokus pada logika yang bisa menyebabkan kehilangan klik atau uang - bukan test
 untuk mengejar coverage.
 
-| # | Test | Yang diverifikasi | Kenapa penting |
-|---|---|---|---|
-| T1 | `links.ts` - rotasi sequence | Indeks maju 0, 1, 2, lalu 0, dan memakai `localStorage` | Bug di rotasi berarti link ter-skip |
-| T2 | `links.ts` - mode random | Mengembalikan elemen dari array, tidak pernah `undefined` | Mencegah link kosong |
-| T3 | `links.ts` - fallback storage | Tidak crash saat `localStorage` melempar error | Webview private mode |
-| T4 | `config.ts` - fetch gagal | Mengembalikan link darurat | Halaman tidak boleh mati |
-| T5 | `config.ts` - JSON rusak | Mengembalikan link darurat | Konfigurasi salah ketik |
-| T6 | `config.ts` - validasi URL | Menolak `javascript:`, `data:`, string kosong; menerima `https://` | Mencegah salah config jadi celah |
-| T7 | `redirect.ts` - popup berhasil | `window.open` dipanggil; `opener` di-null-kan | Jalur normal |
-| T8 | `redirect.ts` - popup diblokir | `window.location.href` di-set ke URL | **Skenario TikTok/IG** |
-| T9 | `App.tsx` | CTA ter-render dengan teks dari config | Halaman benar-benar tampil |
-| T10 | `App.tsx` | Klik CTA memicu `openAffiliate` dengan URL yang benar | Integrasi end-to-end |
+| #   | Test                           | Yang diverifikasi                                                  | Kenapa penting                      |
+| --- | ------------------------------ | ------------------------------------------------------------------ | ----------------------------------- |
+| T1  | `links.ts` - rotasi sequence   | Indeks maju 0, 1, 2, lalu 0, dan memakai `localStorage`            | Bug di rotasi berarti link ter-skip |
+| T2  | `links.ts` - mode random       | Mengembalikan elemen dari array, tidak pernah `undefined`          | Mencegah link kosong                |
+| T3  | `links.ts` - fallback storage  | Tidak crash saat `localStorage` melempar error                     | Webview private mode                |
+| T4  | `config.ts` - fetch gagal      | Mengembalikan link darurat                                         | Halaman tidak boleh mati            |
+| T5  | `config.ts` - JSON rusak       | Mengembalikan link darurat                                         | Konfigurasi salah ketik             |
+| T6  | `config.ts` - validasi URL     | Menolak `javascript:`, `data:`, string kosong; menerima `https://` | Mencegah salah config jadi celah    |
+| T7  | `redirect.ts` - popup berhasil | `window.open` dipanggil; `opener` di-null-kan                      | Jalur normal                        |
+| T8  | `redirect.ts` - popup diblokir | `window.location.href` di-set ke URL                               | **Skenario TikTok/IG**              |
+| T9  | `App.tsx`                      | CTA ter-render dengan teks dari config                             | Halaman benar-benar tampil          |
+| T10 | `App.tsx`                      | Klik CTA memicu `openAffiliate` dengan URL yang benar              | Integrasi end-to-end                |
 
 Test menggunakan `jsdom`; `window.open` di-mock dengan `vi.fn()`.
 
@@ -515,12 +515,12 @@ pernah terekam ke git.
 Key `0f29...109f` **sudah publik di repositori publik**. Rencana penanganan,
 diurutkan berdasarkan efektivitas:
 
-| Langkah | Efektivitas |
-|---|---|
-| **1. Revoke key tersebut di dashboard TMDB dan buat key baru** | **Wajib. Satu-satunya langkah yang benar-benar menghentikan penyalahgunaan** |
-| 2. Hapus key dari source dan dari `archive/browser.html` (diganti placeholder) | Mencegah kebocoran baru |
-| 3. Rewrite git history agar key tidak ada lagi di commit lama | Kebersihan repo jangka panjang |
-| 4. Force-push dan koordinasi dengan kolaborator | Diperlukan agar langkah 3 berlaku |
+| Langkah                                                                        | Efektivitas                                                                  |
+| ------------------------------------------------------------------------------ | ---------------------------------------------------------------------------- |
+| **1. Revoke key tersebut di dashboard TMDB dan buat key baru**                 | **Wajib. Satu-satunya langkah yang benar-benar menghentikan penyalahgunaan** |
+| 2. Hapus key dari source dan dari `archive/browser.html` (diganti placeholder) | Mencegah kebocoran baru                                                      |
+| 3. Rewrite git history agar key tidak ada lagi di commit lama                  | Kebersihan repo jangka panjang                                               |
+| 4. Force-push dan koordinasi dengan kolaborator                                | Diperlukan agar langkah 3 berlaku                                            |
 
 **Peringatan penting:** rewrite history **tidak** dapat menarik kembali key dari
 cache GitHub, fork orang lain, klon yang sudah beredar, maupun crawler pihak
@@ -536,13 +536,13 @@ langkah teknis akan ditentukan pada tahap implementation plan.
 
 ## 14. Migrasi dan pembersihan repo
 
-| # | Tindakan | Hasil |
-|---|---|---|
-| 1 | `HTML.html` menjadi `archive/browser.html`, **API key distrip jadi placeholder** | Fitur lama tersimpan, tapi key tidak masuk history baru |
-| 2 | File `HTML` (tanpa ekstensi) menjadi `git rm HTML` | `git status` bersih, tidak ada lagi `deleted: HTML` |
-| 3 | Tambah `.gitignore` (termasuk `.env`, `dist/`, `node_modules`, `*.tsbuildinfo`) | Repo bersih |
-| 4 | Tulis ulang `README.md` | Berisi cara ganti link dan cara deploy |
-| 5 | Hapus reference TMDB dari README dan proyek | Tidak ada petunjuk menuju key |
+| #   | Tindakan                                                                         | Hasil                                                   |
+| --- | -------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| 1   | `HTML.html` menjadi `archive/browser.html`, **API key distrip jadi placeholder** | Fitur lama tersimpan, tapi key tidak masuk history baru |
+| 2   | File `HTML` (tanpa ekstensi) menjadi `git rm HTML`                               | `git status` bersih, tidak ada lagi `deleted: HTML`     |
+| 3   | Tambah `.gitignore` (termasuk `.env`, `dist/`, `node_modules`, `*.tsbuildinfo`)  | Repo bersih                                             |
+| 4   | Tulis ulang `README.md`                                                          | Berisi cara ganti link dan cara deploy                  |
+| 5   | Hapus reference TMDB dari README dan proyek                                      | Tidak ada petunjuk menuju key                           |
 
 **Catatan tentang `archive/browser.html`:** file ini **tidak** akan berfungsi
 tanpa API key. Ini disengaja - file tersebut dipertahankan hanya untuk
@@ -554,17 +554,17 @@ di `README.md` dan di komentar atas file tersebut.
 Pekerjaan tidak dianggap selesai sebelum semua poin berikut terbukti, dengan
 output perintah yang sesungguhnya dilampirkan - bukan klaim.
 
-| # | Verifikasi | Cara |
-|---|---|---|
-| V1 | Linter bersih | `npm run lint` exit 0 |
-| V2 | Typecheck bersih | `npm run typecheck` exit 0 |
-| V3 | Semua test lulus | `npm test` - melaporkan jumlah test lulus |
-| V4 | Build berhasil | `npm run build` exit 0, `dist/` terbentuk |
-| V5 | **`config.json` ada di `dist/`** | `dist/config.json` benar-benar ada dan isinya utuh |
-| V6 | Halaman berjalan dari hasil build | `npm run preview`, buka di browser |
-| V7 | Klik membuka URL yang benar | Verifikasi manual; URL sesuai `config.json` |
-| V8 | Fallback popup-blocked berfungsi | `window.open` di-mock mengembalikan `null`, verifikasi navigasi terjadi |
-| V9 | Tampilan benar di viewport mobile | Cek pada lebar 375px dan 430px |
+| #   | Verifikasi                              | Cara                                                                      |
+| --- | --------------------------------------- | ------------------------------------------------------------------------- |
+| V1  | Linter bersih                           | `npm run lint` exit 0                                                     |
+| V2  | Typecheck bersih                        | `npm run typecheck` exit 0                                                |
+| V3  | Semua test lulus                        | `npm test` - melaporkan jumlah test lulus                                 |
+| V4  | Build berhasil                          | `npm run build` exit 0, `dist/` terbentuk                                 |
+| V5  | **`config.json` ada di `dist/`**        | `dist/config.json` benar-benar ada dan isinya utuh                        |
+| V6  | Halaman berjalan dari hasil build       | `npm run preview`, buka di browser                                        |
+| V7  | Klik membuka URL yang benar             | Verifikasi manual; URL sesuai `config.json`                               |
+| V8  | Fallback popup-blocked berfungsi        | `window.open` di-mock mengembalikan `null`, verifikasi navigasi terjadi   |
+| V9  | Tampilan benar di viewport mobile       | Cek pada lebar 375px dan 430px                                            |
 | V10 | Tidak ada jejak rahasia TMDB di `dist/` | `grep -rniE "themoviedb\|api_key\|0f29" dist/` tidak menghasilkan apa pun |
 
 V10 adalah pengaman terhadap M3: memastikan tidak ada kunci yang bocor ke
@@ -586,37 +586,37 @@ Bukan bagian dari pekerjaan ini, dicatat agar tidak hilang:
 
 ## 17. Risiko dan mitigasi
 
-| Risiko | Kemungkinan | Dampak | Mitigasi |
-|---|---|---|---|
-| Popup diblokir di in-app browser, klik hilang | **Tinggi** | **Tinggi** | Fallback `location.href` (bagian 8) + test T8 |
-| Pemilik proyek bingung karena perubahan link tidak langsung tampak (cache GitHub) | Sedang | Sedang | Cache-busting `?t=timestamp` (bagian 12) |
-| `config.json` salah format, halaman mati | Sedang | Tinggi | Validasi + link darurat (bagian 7, 9) |
-| TypeScript 7 memecahkan linter | **Tinggi** jika tidak dipin | Sedang | Pin `typescript@5.9.3` (bagian 10) |
-| API key TMDB terus disalahgunakan | **Tinggi** (sudah publik) | Sedang | Revoke key (bagian 13.4) |
-| Domain berganti, aset 404 | Sedang | Tinggi | Semua path relatif, `base: './'` (bagian 5.4) |
-| `archive/browser.html` tanpa sengaja ter-deploy | Rendah | Tinggi | Ditaruh di luar `public/` (bagian 6) |
-| Klik hilang karena tombol gagal render saat config error | Rendah | Tinggi | Link darurat di kode (bagian 9) |
+| Risiko                                                                            | Kemungkinan                 | Dampak     | Mitigasi                                      |
+| --------------------------------------------------------------------------------- | --------------------------- | ---------- | --------------------------------------------- |
+| Popup diblokir di in-app browser, klik hilang                                     | **Tinggi**                  | **Tinggi** | Fallback `location.href` (bagian 8) + test T8 |
+| Pemilik proyek bingung karena perubahan link tidak langsung tampak (cache GitHub) | Sedang                      | Sedang     | Cache-busting `?t=timestamp` (bagian 12)      |
+| `config.json` salah format, halaman mati                                          | Sedang                      | Tinggi     | Validasi + link darurat (bagian 7, 9)         |
+| TypeScript 7 memecahkan linter                                                    | **Tinggi** jika tidak dipin | Sedang     | Pin `typescript@5.9.3` (bagian 10)            |
+| API key TMDB terus disalahgunakan                                                 | **Tinggi** (sudah publik)   | Sedang     | Revoke key (bagian 13.4)                      |
+| Domain berganti, aset 404                                                         | Sedang                      | Tinggi     | Semua path relatif, `base: './'` (bagian 5.4) |
+| `archive/browser.html` tanpa sengaja ter-deploy                                   | Rendah                      | Tinggi     | Ditaruh di luar `public/` (bagian 6)          |
+| Klik hilang karena tombol gagal render saat config error                          | Rendah                      | Tinggi     | Link darurat di kode (bagian 9)               |
 
 ## 18. Ringkasan keputusan
 
-| Keputusan | Alasan utama |
-|---|---|
-| React 19 + Vite 8 + TypeScript | Permintaan pemilik proyek akan tooling dan struktur yang layak |
-| `config.json` di `public/` (runtime) | Menyelesaikan konflik build step vs ganti link cepat |
-| Tanpa routing | Satu halaman, YAGNI |
-| Tanpa TMDB | Menghapus seluruh kebutuhan rahasia |
-| `base: './'` | Tahan ganti domain |
-| Pin TypeScript 5.9.3 | Kompatibilitas `typescript-eslint` |
-| `window.open` tanpa `noopener`, lalu set `win.opener = null` | Agar deteksi popup-block benar-benar bekerja |
-| Fallback `location.href` | Melindungi klik di in-app browser |
-| Deploy via GitHub Actions | Mencegah versi rusak sampai ke publik |
-| Link darurat ditanam di kode | Halaman tidak pernah menampilkan tombol mati |
-| API key distrip dari `archive/` | Mencegah kebocoran berulang |
+| Keputusan                                                    | Alasan utama                                                   |
+| ------------------------------------------------------------ | -------------------------------------------------------------- |
+| React 19 + Vite 8 + TypeScript                               | Permintaan pemilik proyek akan tooling dan struktur yang layak |
+| `config.json` di `public/` (runtime)                         | Menyelesaikan konflik build step vs ganti link cepat           |
+| Tanpa routing                                                | Satu halaman, YAGNI                                            |
+| Tanpa TMDB                                                   | Menghapus seluruh kebutuhan rahasia                            |
+| `base: './'`                                                 | Tahan ganti domain                                             |
+| Pin TypeScript 5.9.3                                         | Kompatibilitas `typescript-eslint`                             |
+| `window.open` tanpa `noopener`, lalu set `win.opener = null` | Agar deteksi popup-block benar-benar bekerja                   |
+| Fallback `location.href`                                     | Melindungi klik di in-app browser                              |
+| Deploy via GitHub Actions                                    | Mencegah versi rusak sampai ke publik                          |
+| Link darurat ditanam di kode                                 | Halaman tidak pernah menampilkan tombol mati                   |
+| API key distrip dari `archive/`                              | Mencegah kebocoran berulang                                    |
 
 ### 18.1 Kenapa desain ini tidak akan merepotkan di kemudian hari
 
-Pertanyaan yang diajukan pemilik proyek: *"apakah spec ini memaksimalkan agar
-future development tetap mudah dan tidak jadi pusing karena kompleksitas?"*
+Pertanyaan yang diajukan pemilik proyek: _"apakah spec ini memaksimalkan agar
+future development tetap mudah dan tidak jadi pusing karena kompleksitas?"_
 
 Jawaban jujurnya: **ya, dan sebagian besar karena satu keputusan, bukan karena
 banyaknya fitur.** Penjelasannya sebagai berikut.
@@ -629,14 +629,14 @@ ditinggalkan berbulan-bulan lalu dibuka lagi tanpa rasa pusing.
 
 **Yang sengaja TIDAK dipakai, dan alasan di baliknya:**
 
-| Tidak dipakai | Alasan |
-|---|---|
+| Tidak dipakai                    | Alasan                                                            |
+| -------------------------------- | ----------------------------------------------------------------- |
 | State management (Redux/Zustand) | Tidak ada state bersama; satu `useState` di `App.tsx` sudah cukup |
-| React Router | Satu halaman; router hanya menambah konsep tanpa manfaat |
-| CSS framework (Tailwind/MUI) | Satu file `styles.css` sudah cukup, dan menghindari kunci versi |
-| Library animasi | Animasi CSS murni; menghindari dependensi runtime tambahan |
-| Data fetching library | Satu `fetch` biasa ke `config.json` |
-| i18n | Halaman satu bahasa; YAGNI |
+| React Router                     | Satu halaman; router hanya menambah konsep tanpa manfaat          |
+| CSS framework (Tailwind/MUI)     | Satu file `styles.css` sudah cukup, dan menghindari kunci versi   |
+| Library animasi                  | Animasi CSS murni; menghindari dependensi runtime tambahan        |
+| Data fetching library            | Satu `fetch` biasa ke `config.json`                               |
+| i18n                             | Halaman satu bahasa; YAGNI                                        |
 
 **Tiga hal yang menjamin iterasi berikutnya tetap murah:**
 
@@ -654,16 +654,16 @@ ditinggalkan berbulan-bulan lalu dibuka lagi tanpa rasa pusing.
 
 **Yang akan benar-benar menjadi pusing, dan bagaimana menghindarinya:**
 
-| Sumber pusing di masa depan | Kapan muncul | Cara menghindarinya |
-|---|---|---|
-| Version drift (Vite/React major baru) | 6-12 bulan | Dependensi dipin ke versi minor via `package-lock.json`. **Jangan** lakukan upgrade besar tanpa menjalankan `lint` + `typecheck` + `test` (halaman 10) |
-| Kelas masalah peer dependency (seperti TS 7 vs typescript-eslint) | Saat upgrade | Selalu periksa `peerDependencies` sebelum menaikkan versi major; sudah terdokumentasi di bagian 10 |
-| Rotasi link terasa membingungkan pemilik proyek | Saat ada 2+ link | Bisa dinonaktifkan kapan saja dengan `"rotation": "sequence"` dan satu item, atau diubah ke `"random"` |
-| Konfigurasi salah ketik mematikan halaman | Kapan saja | Validasi + link darurat (bagian 9); halaman tidak pernah menampilkan tombol mati |
-| Rahasia bocor lagi lewat `.env` | Saat menambah API key | Peringatan eksplisit di `.env.example` (bagian 13.3) |
+| Sumber pusing di masa depan                                       | Kapan muncul          | Cara menghindarinya                                                                                                                                    |
+| ----------------------------------------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Version drift (Vite/React major baru)                             | 6-12 bulan            | Dependensi dipin ke versi minor via `package-lock.json`. **Jangan** lakukan upgrade besar tanpa menjalankan `lint` + `typecheck` + `test` (halaman 10) |
+| Kelas masalah peer dependency (seperti TS 7 vs typescript-eslint) | Saat upgrade          | Selalu periksa `peerDependencies` sebelum menaikkan versi major; sudah terdokumentasi di bagian 10                                                     |
+| Rotasi link terasa membingungkan pemilik proyek                   | Saat ada 2+ link      | Bisa dinonaktifkan kapan saja dengan `"rotation": "sequence"` dan satu item, atau diubah ke `"random"`                                                 |
+| Konfigurasi salah ketik mematikan halaman                         | Kapan saja            | Validasi + link darurat (bagian 9); halaman tidak pernah menampilkan tombol mati                                                                       |
+| Rahasia bocor lagi lewat `.env`                                   | Saat menambah API key | Peringatan eksplisit di `.env.example` (bagian 13.3)                                                                                                   |
 
 **Kesimpulan jujurnya:** kompleksitas proyek ini nyaris terpusat pada satu
-baris, yaitu `config.json`. Menambah fitur di masa depan tetap murah *selama*
+baris, yaitu `config.json`. Menambah fitur di masa depan tetap murah _selama_
 fitur baru itu juga diperlakukan sebagai data. Yang akan membuat proyek ini
 sulit bukanlah React, Vite, atau jumlah file - melainkan menaruh konten kembali
 ke dalam kode. Karena itu aturan pemisahan konten dan kode (poin 1 di atas)
