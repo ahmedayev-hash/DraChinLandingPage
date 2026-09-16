@@ -8,7 +8,7 @@ permissions:
   pages: write
   id-token: write
 
-# Batalkan deploy yang masih berjalan bila ada push baru.
+# Batalkan deploy yang masih berjalan bila ada deploy baru dipicu.
 concurrency:
   group: pages
   cancel-in-progress: true
