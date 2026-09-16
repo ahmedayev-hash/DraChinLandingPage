@@ -14,7 +14,7 @@ export default tseslint.config(
     rules: { ...reactHooks.configs.recommended.rules },
   },
   {
-    files: ['*.config.{js,ts}', 'vite.config.ts', 'src/test-setup.ts'],
+    files: ['*.config.{js,ts}', 'vite.config.ts', 'src/test-setup.ts', 'tools/**/*.ts'],
     languageOptions: { globals: { ...globals.node } },
   },
 );

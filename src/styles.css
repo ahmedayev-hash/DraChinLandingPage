@@ -159,8 +159,414 @@ body {
   font-size: 12px;
 }
 
+/* Atribusi TMDB di landing page. Landing sengaja tidak memakai kerangka
+   situs, jadi teks ini berdiri sendiri di bawah catatan kecil. */
+.attribution {
+  margin: 6px 0 0;
+  text-align: center;
+  color: rgba(154, 160, 171, 0.72);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .cta {
     transition: none;
   }
+
+  .overlay__spinner {
+    animation: none;
+  }
+
+  .modal__panel {
+    animation: none;
+  }
+
+  .card__poster {
+    transition: none;
+  }
+}
+
+.countdown {
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+.countdown__cancel {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--accent);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* Kerangka situs: kepala dan kaki mengapit isi halaman katalog. */
+.site {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+.site-head {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  /* Latar semi transparan + blur: brand tetap terbaca saat poster berwarna
+     terang lewat di belakangnya ketika halaman digulir. */
+  background: rgba(9, 10, 14, 0.82);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.site-head__inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0.85rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.site-head__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 1.05rem;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+}
+
+.site-head__mark {
+  width: 1.5rem;
+  height: 1.5rem;
+  flex: none;
+}
+
+.site-head__mark rect {
+  fill: var(--accent);
+}
+
+.site-head__mark path {
+  fill: #fff;
+}
+
+.site-head__tagline {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.site-foot {
+  margin-top: auto;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  background: #07080b;
+}
+
+.site-foot__inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem calc(1.5rem + env(safe-area-inset-bottom));
+  text-align: center;
+}
+
+.site-foot__brand {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  color: var(--muted);
+}
+
+.site-foot__tagline {
+  margin: 0.35rem 0 0;
+  font-size: 0.75rem;
+  color: rgba(154, 160, 171, 0.72);
+}
+
+.site-foot__legal {
+  margin: 0.85rem 0 0;
+  font-size: 0.7rem;
+  line-height: 1.5;
+  color: rgba(154, 160, 171, 0.62);
+  /* Atribusi tidak boleh memaksa lebar halaman melebihi layar. */
+  text-wrap: balance;
+}
+
+/* Di layar sempit tagline disembunyikan supaya brand tidak terpotong. */
+@media (max-width: 420px) {
+  .site-head__tagline {
+    display: none;
+  }
+}
+
+.catalog {
+  /* Mengisi ruang antara header dan footer sehingga footer tetap menempel
+     di bawah walau katalognya pendek. */
+  flex: 1;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 3rem;
+}
+
+.catalog__title {
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  margin: 0;
+}
+
+.catalog__count {
+  color: var(--muted);
+  margin: 0.25rem 0 1.25rem;
+  font-size: 0.9rem;
+}
+
+.catalog__missing {
+  text-align: center;
+  color: var(--muted);
+  padding: 2rem 0;
+}
+
+.catalog--empty {
+  text-align: center;
+  padding: 4rem 1rem;
+}
+
+.retry {
+  margin-top: 1rem;
+  padding: 0.6rem 1.2rem;
+  border-radius: 999px;
+  border: 1px solid var(--accent);
+  background: none;
+  color: var(--fg);
+  cursor: pointer;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.card__poster {
+  position: relative;
+  display: block;
+  aspect-ratio: 2 / 3;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background: linear-gradient(150deg, #2a2a35 0%, #14141b 60%, #0b0b10 100%);
+  transition: transform 160ms ease;
+}
+
+.card:hover .card__poster,
+.card:focus-visible .card__poster {
+  transform: translateY(-2px);
+}
+
+.card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.card__play {
+  position: absolute;
+  right: 0.5rem;
+  bottom: 0.5rem;
+  width: 2rem;
+  height: 2rem;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: rgb(0 0 0 / 55%);
+  backdrop-filter: blur(4px);
+  font-size: 0.75rem;
+}
+
+.card__title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card__meta {
+  display: flex;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 1rem;
+  background: rgb(8 8 12 / 92%);
+  backdrop-filter: blur(6px);
+}
+
+.overlay__spinner {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 999px;
+  border: 3px solid rgb(255 255 255 / 18%);
+  border-top-color: var(--accent);
+  animation: spin 800ms linear infinite;
+}
+
+.overlay__text {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.modal {
+  padding: 0;
+  border: 0;
+  background: none;
+  width: min(92vw, 900px);
+  max-width: 900px;
+  max-height: 90vh;
+  color: var(--fg);
+}
+
+.modal::backdrop {
+  background: rgb(0 0 0 / 72%);
+  backdrop-filter: blur(4px);
+}
+
+.modal__panel {
+  position: relative;
+  border-radius: 1rem;
+  background: #14141b;
+  max-height: 90vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  animation: modal-in 200ms ease;
+}
+
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+.modal__close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 2;
+  width: 2.25rem;
+  height: 2.25rem;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 999px;
+  background: rgb(0 0 0 / 60%);
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.modal__player {
+  aspect-ratio: 16 / 9;
+  background: #000;
+}
+
+.modal__frame {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+.modal__no-trailer {
+  height: 100%;
+  margin: 0;
+  display: grid;
+  place-content: center;
+  color: var(--muted);
+  padding: 1rem;
+  text-align: center;
+}
+
+.modal__body {
+  padding: 1rem 1.25rem 1.5rem;
+}
+
+.modal__title {
+  font-size: clamp(1.15rem, 3vw, 1.5rem);
+  margin: 0 0 0.25rem;
+}
+
+.modal__meta {
+  display: flex;
+  gap: 0.75rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin: 0 0 0.75rem;
+}
+
+.modal__overview {
+  color: var(--muted);
+  line-height: 1.6;
+  margin: 0 0 1.25rem;
+  /* Sinopsis panjang tidak boleh mengambil alih seluruh layar. */
+  max-height: 30vh;
+  overflow-y: auto;
+}
+
+.modal__attribution {
+  margin: 1rem 0 0;
+  font-size: 0.7rem;
+  color: var(--muted);
+  text-align: center;
 }

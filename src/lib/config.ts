@@ -1,6 +1,7 @@
 import type { Rotation } from './links';
 
 export interface SiteConfig {
+  brand: string;
   headline: string;
   subheadline: string;
   ctaText: string;
@@ -18,6 +19,7 @@ export interface SiteConfig {
  * dipakai sehingga tombol CTA tetap berfungsi.
  */
 export const FALLBACK_CONFIG: SiteConfig = {
+  brand: 'DRACINMOVIE',
   headline: 'Drama ini bikin kamu lupa waktu',
   subheadline: 'Episode baru tiap hari • Sub Indo',
   ctaText: 'TONTON SEKARANG',
@@ -64,6 +66,7 @@ export function parseConfig(raw: unknown): SiteConfig {
   const badges = readStringArray(source['badges']);
 
   return {
+    brand: readString(source['brand'], FALLBACK_CONFIG.brand),
     headline: readString(source['headline'], FALLBACK_CONFIG.headline),
     subheadline: readString(source['subheadline'], FALLBACK_CONFIG.subheadline),
     ctaText: readString(source['ctaText'], FALLBACK_CONFIG.ctaText),

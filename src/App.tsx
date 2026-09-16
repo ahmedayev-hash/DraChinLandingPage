@@ -1,14 +1,19 @@
 import { useCallback, useEffect, useState } from 'react';
-import { CtaButton } from './components/CtaButton';
+import { useCatalog } from './hooks/useCatalog';
+import { useHashRoute } from './hooks/useHashRoute';
 import { FALLBACK_CONFIG, loadConfig, type SiteConfig } from './lib/config';
-import { pickLink } from './lib/links';
-import { openAffiliate } from './lib/redirect';
+import { buildHash, parseRoute } from './lib/router';
+import { CatalogPage } from './pages/CatalogPage';
+import { LandingPage } from './pages/LandingPage';
 
 export default function App() {
-  // Dimulai dari FALLBACK_CONFIG agar CTA langsung tampil dan dapat diklik
-  // sejak frame pertama - tidak pernah ada tombol mati sementara config dimuat.
+  // Dimulai dari FALLBACK_CONFIG agar halaman langsung tampil dan dapat
+  // diklik sejak frame pertama, tanpa menunggu jaringan.
   const [config, setConfig] = useState<SiteConfig>(FALLBACK_CONFIG);
-  const [posterFailed, setPosterFailed] = useState(false);
+
+  const hash = useHashRoute();
+  const route = parseRoute(hash);
+  const { catalog, failed, retry } = useCatalog();
 
   useEffect(() => {
     let active = true;
@@ -24,47 +29,44 @@ export default function App() {
     };
   }, []);
 
-  const handleClick = useCallback(() => {
-    const url = pickLink(config.links, config.rotation);
+  /**
+   * Memakai location.replace, bukan penugasan location.hash.
+   *
+   * Bila penugasan biasa dipakai, riwayat berisi landing lalu katalog,
+   * sehingga tombol kembali mengembalikan pengunjung ke landing dan hitungan
+   * mundur 8 detik terpicu lagi. Pengunjung akan terjebak dalam lingkaran
+   * landing ke katalog ke landing.
+   */
+  const enterCatalog = useCallback(() => {
+    window.location.replace(buildHash({ name: 'catalog' }));
+  }, []);
 
-    if (url) {
-      openAffiliate(url);
-    }
-  }, [config]);
+  /** Membuka modal. Menambah entri riwayat supaya tombol kembali menutupnya. */
+  const openDetail = useCallback((id: string) => {
+    window.location.hash = buildHash({ name: 'catalog', detailId: id });
+  }, []);
+
+  /**
+   * Menutup modal. Memakai replace supaya riwayat tidak menumpuk; tanpa ini
+   * pengunjung harus menekan tombol kembali dua kali hanya untuk keluar dari
+   * satu modal.
+   */
+  const closeDetail = useCallback(() => {
+    window.location.replace(buildHash({ name: 'catalog' }));
+  }, []);
+
+  if (route.name === 'landing') {
+    return <LandingPage config={config} onEnterCatalog={enterCatalog} />;
+  }
 
   return (
-    <main className="page">
-      <div className="poster">
-        {!posterFailed && (
-          <img
-            className="poster__img"
-            src={config.poster}
-            alt=""
-            fetchPriority="high"
-            onError={() => setPosterFailed(true)}
-          />
-        )}
-        <div className="poster__scrim" />
-      </div>
-
-      <section className="content">
-        {config.badges.length > 0 && (
-          <ul className="badges">
-            {config.badges.map((badge) => (
-              <li key={badge} className="badges__item">
-                {badge}
-              </li>
-            ))}
-          </ul>
-        )}
-
-        <h1 className="headline">{config.headline}</h1>
-        <p className="subheadline">{config.subheadline}</p>
-
-        <CtaButton label={config.ctaText} onClick={handleClick} />
-
-        <p className="note">Gratis • Tanpa registrasi</p>
-      </section>
-    </main>
+    <CatalogPage
+      catalog={catalog}
+      config={config}
+      detailId={route.detailId}
+      onOpenDetail={openDetail}
+      onCloseDetail={closeDetail}
+      {...(failed ? { onRetry: retry } : {})}
+    />
   );
 }
