@@ -1,0 +1,12 @@
+# Output build - dihasilkan oleh vite/tsc, jangan diformat.
+dist/
+
+# Lockfile - dihasilkan oleh pnpm.
+pnpm-lock.yaml
+
+# Arsip referensi lama (HTML monolitik). Sengaja dibiarkan apa adanya agar
+# perbandingan dengan versi aslinya tetap mudah dibaca.
+archive/
+
+# State sesi dan memori Pi - bukan bagian dari proyek.
+.pi/
