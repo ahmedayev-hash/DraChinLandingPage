@@ -1,8 +1,6 @@
 name: Deploy to GitHub Pages
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -33,6 +31,26 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm build
+        env:
+          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+
+      # Kunci API hanya boleh hidup di proses build. Langkah ini gagal bila
+      # nilainya ternyata ikut tertulis ke dalam hasil build.
+      - name: Pastikan kunci API tidak bocor ke hasil build
+        env:
+          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+        run: |
+          if [ -z "$TMDB_API_KEY" ]; then
+            echo "TMDB_API_KEY kosong, pemeriksaan dilewati."
+            exit 0
+          fi
+
+          if grep -rl -- "$TMDB_API_KEY" dist/; then
+            echo "BAHAYA: kunci API ditemukan di dalam dist/"
+            exit 1
+          fi
+
+          echo "BERSIH: kunci API tidak ada di dalam dist/"
 
       - uses: actions/configure-pages@v6.0.0
 
