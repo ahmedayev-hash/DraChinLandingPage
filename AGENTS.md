@@ -105,6 +105,14 @@ Tests import `describe`/`it`/`expect` explicitly from `vitest` even though `glob
 5. `pnpm build` needs network access when `TMDB_API_KEY` is set, but neither a missing key nor an unreachable TMDB is a failure: the catalog plugin falls back. Do not skip the build because it touches the network.
 6. Keep code in the existing layout: `src/lib/` pure logic, `src/hooks/` React hooks, `src/components/` presentational, `src/pages/` route-level, `tools/catalog/` build-time only.
 
+### Git: never commit unless explicitly told
+
+**Do not run `git commit` (or `git push`, `git tag`, `git reset`, or any other history-changing command) unless the user has explicitly asked you to in the current request.** "Implement it", "fix it", "add it", "write specs then plan then implement", or "do not ask for approval" are **not** permission to commit. They authorize editing files, not recording history.
+
+Finishing work means the files are written and the Required Gates pass. Leave the change staged-free and uncommitted, then report what changed and let the user decide when to commit.
+
+If a task genuinely requires a commit to proceed, ask first and wait for a yes. Never commit "to be helpful" — an unexpected commit is hard to undo once it is pushed, and on this repository a push to `main` deploys to production.
+
 ## Required Gates (Definition of Done)
 
 Five gates must pass before any change counts as done. Run all five; a passing subset is not completion:
