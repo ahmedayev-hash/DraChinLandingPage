@@ -1,8 +1,40 @@
+import { StrictMode } from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { FALLBACK_CONFIG } from '../lib/config';
+import { openAffiliate, tryOpenNewTab } from '../lib/redirect';
 import { LandingPage } from './LandingPage';
+
+vi.mock('../lib/redirect', () => ({
+  openAffiliate: vi.fn(),
+  tryOpenNewTab: vi.fn(() => true),
+}));
+
+/**
+ * Membungkus LandingPage dengan prop wajib.
+ *
+ * configReady=true adalah kondisi normal pengunjung (config.json sudah dibaca).
+ * Tes yang menguji perilaku sebelum config siap memberi nilai eksplisit.
+ */
+function renderLanding(
+  props: Partial<Parameters<typeof LandingPage>[0]> = {},
+): ReturnType<typeof render> {
+  return render(
+    <LandingPage
+      config={FALLBACK_CONFIG}
+      configReady
+      onEnterCatalog={() => undefined}
+      {...props}
+    />,
+  );
+}
+
+beforeEach(() => {
+  vi.mocked(tryOpenNewTab).mockClear();
+  vi.mocked(tryOpenNewTab).mockReturnValue(true);
+  vi.mocked(openAffiliate).mockClear();
+});
 
 afterEach(() => {
   vi.useRealTimers();
@@ -10,7 +42,7 @@ afterEach(() => {
 
 describe('LandingPage', () => {
   it('menampilkan headline dan badge dari config', () => {
-    render(<LandingPage config={FALLBACK_CONFIG} onEnterCatalog={() => undefined} />);
+    renderLanding();
 
     expect(
       screen.getByRole('heading', { name: FALLBACK_CONFIG.headline }),
@@ -21,26 +53,126 @@ describe('LandingPage', () => {
     }
   });
 
-  it('tombol utama masuk ke katalog', async () => {
-    const onEnterCatalog = vi.fn();
-    render(<LandingPage config={FALLBACK_CONFIG} onEnterCatalog={onEnterCatalog} />);
+  it('mencoba membuka affiliate tepat sekali saat landing tampil', () => {
+    renderLanding();
 
-    await userEvent.click(screen.getByRole('button', { name: /lihat katalog/i }));
+    expect(tryOpenNewTab).toHaveBeenCalledTimes(1);
+    expect(FALLBACK_CONFIG.links).toContain(vi.mocked(tryOpenNewTab).mock.calls[0]?.[0]);
+  });
+
+  it('tidak mencoba apa pun sebelum config selesai dimuat', () => {
+    renderLanding({ configReady: false });
+
+    expect(tryOpenNewTab).not.toHaveBeenCalled();
+  });
+
+  it('tidak mencoba membuka bila tidak ada link', () => {
+    renderLanding({ config: { ...FALLBACK_CONFIG, links: [] } });
+
+    expect(tryOpenNewTab).not.toHaveBeenCalled();
+  });
+
+  it('tidak menggandakan percobaan walau StrictMode memanggil efek dua kali', () => {
+    render(
+      <StrictMode>
+        <LandingPage
+          config={FALLBACK_CONFIG}
+          configReady
+          onEnterCatalog={() => undefined}
+        />
+      </StrictMode>,
+    );
+
+    expect(tryOpenNewTab).toHaveBeenCalledTimes(1);
+  });
+
+  it('mencoba lagi pada klik pertama bila percobaan awal gagal', async () => {
+    vi.mocked(tryOpenNewTab).mockReturnValue(false);
+    const user = userEvent.setup();
+
+    renderLanding({ autoEnterSeconds: 30 });
+
+    expect(tryOpenNewTab).toHaveBeenCalledTimes(1);
+
+    await user.click(screen.getByText(/gratis/i));
+
+    expect(tryOpenNewTab).toHaveBeenCalledTimes(2);
+  });
+
+  it('berhenti mencoba setelah tab baru berhasil dibuka', async () => {
+    const user = userEvent.setup();
+
+    renderLanding({ autoEnterSeconds: 30 });
+
+    // Percobaan awal (L1) berhasil, jadi klik berikutnya tidak mencoba lagi.
+    await user.click(screen.getByText(/gratis/i));
+    await user.click(screen.getByRole('button', { name: /lihat katalog/i }));
+
+    expect(tryOpenNewTab).toHaveBeenCalledTimes(1);
+    expect(openAffiliate).not.toHaveBeenCalled();
+  });
+
+  it('memaksa link lewat openAffiliate saat tombol katalog dan popup diblokir', async () => {
+    vi.mocked(tryOpenNewTab).mockReturnValue(false);
+    const onEnterCatalog = vi.fn();
+    const user = userEvent.setup();
+
+    renderLanding({ onEnterCatalog, autoEnterSeconds: 30 });
+
+    await user.click(screen.getByRole('button', { name: /lihat katalog/i }));
+
+    // Klik pertama sudah dicoba lewat penangkap L2; tombol lalu jatuh ke L3/L4.
+    expect(openAffiliate).toHaveBeenCalledTimes(1);
+    expect(FALLBACK_CONFIG.links).toContain(vi.mocked(openAffiliate).mock.calls[0]?.[0]);
+    // Katalog tidak pernah dibuka: klik tidak boleh hilang, tapi bukan berarti
+    // pengunjung dipindahkan ke katalog.
+    expect(onEnterCatalog).not.toHaveBeenCalled();
+  });
+
+  it('memakai tombol katalog semula bila tidak ada link sama sekali', async () => {
+    const onEnterCatalog = vi.fn();
+    const user = userEvent.setup();
+
+    renderLanding({
+      config: { ...FALLBACK_CONFIG, links: [] },
+      onEnterCatalog,
+      autoEnterSeconds: 30,
+    });
+
+    await user.click(screen.getByRole('button', { name: /lihat katalog/i }));
 
     expect(onEnterCatalog).toHaveBeenCalledOnce();
+    expect(openAffiliate).not.toHaveBeenCalled();
+  });
+
+  it('mematikan seluruh tangga saat autoOpen bernilai false', async () => {
+    const onEnterCatalog = vi.fn();
+    const user = userEvent.setup();
+
+    renderLanding({
+      config: { ...FALLBACK_CONFIG, autoOpen: false },
+      onEnterCatalog,
+      autoEnterSeconds: 30,
+    });
+
+    // Baik percobaan otomatis (L1) maupun penangkap klik pertama (L2) diam.
+    expect(tryOpenNewTab).not.toHaveBeenCalled();
+
+    await user.click(screen.getByText(/gratis/i));
+    expect(tryOpenNewTab).not.toHaveBeenCalled();
+    expect(openAffiliate).not.toHaveBeenCalled();
+
+    // Tombol katalog kembali berfungsi sebagai navigasi biasa.
+    await user.click(screen.getByRole('button', { name: /lihat katalog/i }));
+    expect(onEnterCatalog).toHaveBeenCalledOnce();
+    expect(openAffiliate).not.toHaveBeenCalled();
   });
 
   it('masuk katalog otomatis setelah hitungan mundur selesai', async () => {
     vi.useFakeTimers();
     const onEnterCatalog = vi.fn();
 
-    render(
-      <LandingPage
-        config={FALLBACK_CONFIG}
-        onEnterCatalog={onEnterCatalog}
-        autoEnterSeconds={8}
-      />,
-    );
+    renderLanding({ onEnterCatalog, autoEnterSeconds: 8 });
 
     await vi.advanceTimersByTimeAsync(8000);
 
@@ -51,13 +183,7 @@ describe('LandingPage', () => {
     const onEnterCatalog = vi.fn();
     const user = userEvent.setup();
 
-    render(
-      <LandingPage
-        config={FALLBACK_CONFIG}
-        onEnterCatalog={onEnterCatalog}
-        autoEnterSeconds={0.05}
-      />,
-    );
+    renderLanding({ onEnterCatalog, autoEnterSeconds: 0.05 });
 
     await user.click(screen.getByRole('button', { name: /batalkan/i }));
     await new Promise((resolve) => setTimeout(resolve, 150));
@@ -66,13 +192,7 @@ describe('LandingPage', () => {
   });
 
   it('menyembunyikan hitungan mundur setelah dibatalkan', async () => {
-    render(
-      <LandingPage
-        config={FALLBACK_CONFIG}
-        onEnterCatalog={() => undefined}
-        autoEnterSeconds={30}
-      />,
-    );
+    renderLanding({ autoEnterSeconds: 30 });
 
     await userEvent.click(screen.getByRole('button', { name: /batalkan/i }));
 
@@ -83,13 +203,7 @@ describe('LandingPage', () => {
     vi.useFakeTimers();
     const onEnterCatalog = vi.fn();
 
-    const { unmount } = render(
-      <LandingPage
-        config={FALLBACK_CONFIG}
-        onEnterCatalog={onEnterCatalog}
-        autoEnterSeconds={8}
-      />,
-    );
+    const { unmount } = renderLanding({ onEnterCatalog, autoEnterSeconds: 8 });
 
     unmount();
     await vi.advanceTimersByTimeAsync(20_000);
@@ -98,7 +212,7 @@ describe('LandingPage', () => {
   });
 
   it('memakai latar gradien saat poster gagal dimuat', async () => {
-    render(<LandingPage config={FALLBACK_CONFIG} onEnterCatalog={() => undefined} />);
+    renderLanding();
 
     const poster = document.querySelector('.poster__img');
     expect(poster).not.toBeNull();
@@ -116,13 +230,7 @@ describe('LandingPage', () => {
     vi.useFakeTimers();
     const onEnterCatalog = vi.fn();
 
-    render(
-      <LandingPage
-        config={FALLBACK_CONFIG}
-        onEnterCatalog={onEnterCatalog}
-        autoEnterSeconds={0}
-      />,
-    );
+    renderLanding({ onEnterCatalog, autoEnterSeconds: 0 });
 
     await vi.advanceTimersByTimeAsync(30_000);
 
@@ -130,7 +238,7 @@ describe('LandingPage', () => {
   });
 
   it('menampilkan atribusi TMDB tanpa kerangka header atau footer', () => {
-    render(<LandingPage config={FALLBACK_CONFIG} onEnterCatalog={() => undefined} />);
+    renderLanding();
 
     expect(screen.getByText(/TMDB/)).toBeInTheDocument();
     // Landing page sengaja tidak memakai header/footer situs.

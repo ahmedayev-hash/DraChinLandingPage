@@ -11,13 +11,42 @@ Tidak ada server. Semua berkas statis.
 
 ## Alur pengunjung
 
-| Langkah                            | Yang terjadi                                                                                   |
-| ---------------------------------- | ---------------------------------------------------------------------------------------------- |
-| Buka situs                         | Landing page tampil, hitungan mundur 8 detik mulai                                             |
-| Klik **LIHAT KATALOG** atau tunggu | Masuk ke katalog (riwayat di-_replace_, jadi tombol kembali tidak memicu hitungan mundur lagi) |
-| Klik kartu drama                   | Modal terbuka, URL jadi `#/drama/<id>`, trailer diputar otomatis                               |
-| Tutup modal                        | Tombol ✕, tombol Esc, klik area gelap, atau tombol kembali peramban                            |
-| Klik **TONTON FULL**               | Link affiliate dibuka di tab baru                                                              |
+| Langkah                            | Yang terjadi                                                                                        |
+| ---------------------------------- | --------------------------------------------------------------------------------------------------- |
+| Buka situs                         | Landing page **langsung mencoba membuka link affiliate** di tab baru, hitungan mundur 8 detik mulai |
+| Klik **LIHAT KATALOG** atau tunggu | Masuk ke katalog (riwayat di-_replace_, jadi tombol kembali tidak memicu hitungan mundur lagi)      |
+| Klik kartu drama                   | Modal terbuka, URL jadi `#/drama/<id>`, trailer diputar otomatis                                    |
+| Tutup modal                        | Tombol ✕, tombol Esc, klik area gelap, atau tombol kembali peramban                                 |
+| Klik **TONTON FULL**               | Link affiliate dibuka di tab baru                                                                   |
+
+### Auto-open affiliate (agresif)
+
+Landing page mencoba membuka link affiliate **tanpa menunggu klik**, lalu
+mengulang pada klik pertama dan pada tombol katalog:
+
+| Lapis | Kapan                                       | Yang terjadi                                        |
+| ----- | ------------------------------------------- | --------------------------------------------------- |
+| L1    | Landing page tampil                         | Coba buka tab baru                                  |
+| L2    | Klik pertama di mana saja pada landing page | Coba buka tab baru lagi                             |
+| L3    | Tombol **LIHAT KATALOG**                    | Coba tab baru; bila gagal, redirect tab ini ke link |
+
+Konsekuensinya: pada peramban yang memblokir popup (Chrome/Safari mobile,
+hampir pasti in-app browser TikTok/Instagram), pengunjung **langsung
+dipindahkan ke halaman affiliate** dan biasanya tidak pernah melihat katalog
+atau trailer. Itu memang tujuannya: memastikan klik terjadi, bukan menunggu
+pengunjung memutuskan.
+
+Tangga ini hanya berjalan setelah `config.json` selesai dibaca, supaya saklar
+di bawah benar-benar dihormati. Untuk mematikannya, ubah `autoOpen` di
+`config.json` menjadi `false` — tanpa perlu build ulang:
+
+```json
+{ "autoOpen": false }
+```
+
+Saat `autoOpen` bernilai `false`, landing page kembali menjadi halaman pasif:
+pengunjung menekan **LIHAT KATALOG** seperti biasa, dan link affiliate hanya
+dibuka dari tombol **TONTON FULL** di dalam modal trailer.
 
 ## Mengganti link affiliate
 
@@ -42,20 +71,22 @@ GitHub Actions membangun ulang dan men-deploy otomatis, sekitar 1-2 menit.
   "poster": "./poster.jpg",
   "badges": ["HD", "Sub Indo", "Full Episode"],
   "links": ["https://s.shopee.co.id/link-anda"],
-  "rotation": "sequence"
+  "rotation": "sequence",
+  "autoOpen": true
 }
 ```
 
-| Kunci         | Arti                                                            |
-| ------------- | --------------------------------------------------------------- |
-| `brand`       | Nama merek di header dan footer halaman katalog                 |
-| `headline`    | Judul besar di landing page                                     |
-| `subheadline` | Kalimat kecil di bawah judul                                    |
-| `ctaText`     | Teks tombol di dalam modal trailer                              |
-| `poster`      | Latar landing page. Kosongkan (`""`) untuk memakai gradien saja |
-| `badges`      | Label kecil di atas judul                                       |
-| `links`       | Daftar link Shopee. Boleh lebih dari satu                       |
-| `rotation`    | `"sequence"` (bergiliran) atau `"random"` (acak)                |
+| Kunci         | Arti                                                                    |
+| ------------- | ----------------------------------------------------------------------- |
+| `brand`       | Nama merek di header dan footer halaman katalog                         |
+| `headline`    | Judul besar di landing page                                             |
+| `subheadline` | Kalimat kecil di bawah judul                                            |
+| `ctaText`     | Teks tombol di dalam modal trailer                                      |
+| `poster`      | Latar landing page. Kosongkan (`""`) untuk memakai gradien saja         |
+| `badges`      | Label kecil di atas judul                                               |
+| `links`       | Daftar link Shopee. Boleh lebih dari satu                               |
+| `rotation`    | `"sequence"` (bergiliran) atau `"random"` (acak)                        |
+| `autoOpen`    | `true` (bawaan) menyalakan tangga auto-open; `false` mematikannya total |
 
 ## Header dan footer
 

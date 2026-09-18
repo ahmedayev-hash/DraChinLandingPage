@@ -9,6 +9,14 @@ export interface SiteConfig {
   badges: string[];
   links: string[];
   rotation: Rotation;
+  /**
+   * Menyalakan tangga auto-open affiliate di landing page.
+   *
+   * Bila false, landing page tidak pernah memaksa membuka link: pengunjung
+   * memakai tombol seperti biasa. Lihat
+   * docs/superpowers/specs/2026-09-18-auto-open-affiliate-ladder-design.md.
+   */
+  autoOpen: boolean;
 }
 
 /**
@@ -27,6 +35,7 @@ export const FALLBACK_CONFIG: SiteConfig = {
   badges: ['HD', 'Sub Indo', 'Full Episode'],
   links: ['https://s.shopee.co.id/9peLe2gVIP'],
   rotation: 'sequence',
+  autoOpen: true,
 };
 
 /** Hanya http dan https yang diterima. Skema lain ditolak. */
@@ -74,6 +83,9 @@ export function parseConfig(raw: unknown): SiteConfig {
     badges: badges.length > 0 ? badges : FALLBACK_CONFIG.badges,
     links: links.length > 0 ? links : FALLBACK_CONFIG.links,
     rotation: source['rotation'] === 'random' ? 'random' : 'sequence',
+    // Hanya `false` eksplisit yang mematikan. Nilai hilang, salah tipe, atau
+    // `true` tetap menyalakannya, sehingga perilaku bawaan tidak berubah.
+    autoOpen: source['autoOpen'] !== false,
   };
 }
 

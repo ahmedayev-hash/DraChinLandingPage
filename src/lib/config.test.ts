@@ -66,6 +66,18 @@ describe('parseConfig', () => {
     expect(config.headline).toBe(FALLBACK_CONFIG.headline);
     expect(config.subheadline).toBe(FALLBACK_CONFIG.subheadline);
   });
+
+  it('menyalakan autoOpen secara bawaan', () => {
+    expect(parseConfig({}).autoOpen).toBe(true);
+    expect(parseConfig({ autoOpen: true }).autoOpen).toBe(true);
+    // Nilai salah tipe tidak boleh mematikan perilaku bawaan.
+    expect(parseConfig({ autoOpen: 'tidak' }).autoOpen).toBe(true);
+    expect(parseConfig({ autoOpen: 0 }).autoOpen).toBe(true);
+  });
+
+  it('mematikan autoOpen hanya bila eksplisit false', () => {
+    expect(parseConfig({ autoOpen: false }).autoOpen).toBe(false);
+  });
 });
 
 describe('loadConfig', () => {

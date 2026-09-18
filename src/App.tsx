@@ -10,6 +10,10 @@ export default function App() {
   // Dimulai dari FALLBACK_CONFIG agar halaman langsung tampil dan dapat
   // diklik sejak frame pertama, tanpa menunggu jaringan.
   const [config, setConfig] = useState<SiteConfig>(FALLBACK_CONFIG);
+  // Menandai config.json sudah dibaca. Dipakai landing page untuk menunda
+  // tangga auto-open supaya saklar `autoOpen` di config.json benar-benar
+  // dibaca, bukan tertimpa FALLBACK_CONFIG yang selalu menyalakannya.
+  const [configReady, setConfigReady] = useState(false);
 
   const hash = useHashRoute();
   const route = parseRoute(hash);
@@ -21,6 +25,7 @@ export default function App() {
     void loadConfig().then((loaded) => {
       if (active) {
         setConfig(loaded);
+        setConfigReady(true);
       }
     });
 
@@ -56,7 +61,13 @@ export default function App() {
   }, []);
 
   if (route.name === 'landing') {
-    return <LandingPage config={config} onEnterCatalog={enterCatalog} />;
+    return (
+      <LandingPage
+        config={config}
+        configReady={configReady}
+        onEnterCatalog={enterCatalog}
+      />
+    );
   }
 
   return (
