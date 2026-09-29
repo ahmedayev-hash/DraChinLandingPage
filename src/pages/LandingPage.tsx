@@ -10,21 +10,22 @@ interface LandingPageProps {
   /**
    * Menandakan config.json sudah selesai dimuat.
    *
-   * Tangga auto-open sengaja menunggu ini. Tanpa penantian, L1 akan berjalan
-   * memakai FALLBACK_CONFIG yang selalu `autoOpen: true` sebelum config.json
-   * sempat terbaca, sehingga saklar `autoOpen: false` tidak akan berpengaruh.
-   * Menunggu sepersekian detik tidak merugikan: popup tanpa gestur tetap
-   * diblokir browser.
+   * Percobaan tab baru otomatis (L1) dan penangkap klik pertama (L2) sengaja
+   * menunggu ini. Tanpa penantian, L1 akan berjalan memakai FALLBACK_CONFIG
+   * sebelum config.json sempat terbaca, sehingga saklar `autoOpen: false`
+   * tidak akan berpengaruh. Menunggu sepersekian detik tidak merugikan:
+   * popup tanpa gestur tetap diblokir browser.
    */
   configReady: boolean;
-  autoEnterSeconds?: number;
 }
 
 /**
  * Halaman clickbait.
  *
- * Tombol utama masuk ke katalog. Pengunjung yang pasif juga didorong masuk
- * lewat hitungan mundur yang terlihat dan dapat dibatalkan.
+ * Tombol utama langsung membawa pengunjung ke link affiliate: tab baru bila
+ * diizinkan, redirect di tab yang sama bila popup diblokir (L3/L4). Bila
+ * config tidak membawa link sama sekali, tombol kembali menjadi tombol masuk
+ * katalog seperti semula.
  *
  * Di depannya ada tangga fallback affiliate: percobaan tab baru saat mount
  * (L1), pada klik pertama di mana saja (L2), lalu pada tombol katalog (L3)
@@ -35,11 +36,8 @@ export function LandingPage({
   config,
   onEnterCatalog,
   configReady,
-  autoEnterSeconds = 8,
 }: LandingPageProps) {
   const [posterFailed, setPosterFailed] = useState(false);
-  const [cancelled, setCancelled] = useState(false);
-  const [remaining, setRemaining] = useState(Math.ceil(autoEnterSeconds));
 
   // Link dipilih sekali per mount, lalu diingat.
   //
@@ -132,11 +130,17 @@ export function LandingPage({
     };
   }, [attemptOpen, config.autoOpen, configReady, resolveAffiliateUrl]);
 
-  // Lapis L3: tombol katalog memakai openAffiliate, yang mencoba tab baru lalu
-  // memindahkan tab ini bila popup benar-benar diblokir. Bila tidak ada link
-  // sama sekali, tombol kembali menjadi tombol masuk katalog seperti semula.
+  /**
+   * Membuka link affiliate secara langsung.
+   *
+   * Bila config tidak siap atau tidak membawa link sama sekali, tombol kembali
+   * menjadi tombol masuk katalog seperti semula.
+   *
+   * openAffiliate mencoba tab baru sekali lagi, lalu memindahkan tab ini bila
+   * popup benar-benar diblokir (L4). Klik tidak boleh hilang diam-diam.
+   */
   const handleCtaClick = useCallback(() => {
-    if (!configReady || !config.autoOpen) {
+    if (!configReady) {
       onEnterCatalog();
       return;
     }
@@ -148,8 +152,6 @@ export function LandingPage({
       return;
     }
 
-    firstClickAttempted.current = true;
-
     // Klik pada tombol ini juga merupakan klik pertama, jadi penangkap L2 sudah
     // mencoba lebih dulu (fase capture berjalan sebelum onClick). Bila tab baru
     // sudah terbuka, tidak ada yang perlu dilakukan lagi.
@@ -157,47 +159,9 @@ export function LandingPage({
       return;
     }
 
-    // openAffiliate mencoba tab baru sekali lagi, lalu memindahkan tab ini bila
-    // popup benar-benar diblokir (L4). Klik tidak boleh hilang diam-diam.
     openAffiliate(url);
     opened.current = true;
-  }, [config.autoOpen, configReady, onEnterCatalog, resolveAffiliateUrl]);
-
-  // Penangan disimpan di ref, bukan dipasang sebagai dependensi efek.
-  //
-  // Bila onEnterCatalog menjadi dependensi efek dan induknya membuat fungsi
-  // baru pada setiap render, efek akan berjalan ulang dan menetapkan tenggat
-  // baru terus-menerus. Hitungan mundur tidak akan pernah selesai selama
-  // induknya masih sering merender.
-  const enterRef = useRef(onEnterCatalog);
-
-  useEffect(() => {
-    enterRef.current = onEnterCatalog;
-  }, [onEnterCatalog]);
-
-  useEffect(() => {
-    if (cancelled || autoEnterSeconds <= 0) {
-      return;
-    }
-
-    const deadline = Date.now() + autoEnterSeconds * 1000;
-
-    const tick = setInterval(() => {
-      const left = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
-      setRemaining(left);
-
-      if (left <= 0) {
-        clearInterval(tick);
-        enterRef.current();
-      }
-    }, 250);
-
-    // Pembersihan ini wajib: tanpa itu, pengunjung yang sudah berpindah
-    // halaman tetap akan dipindahkan lagi oleh timer yang tertinggal.
-    return () => {
-      clearInterval(tick);
-    };
-  }, [autoEnterSeconds, cancelled]);
+  }, [configReady, onEnterCatalog, resolveAffiliateUrl]);
 
   return (
     <main className="page">
@@ -231,21 +195,6 @@ export function LandingPage({
         <p className="subheadline">{config.subheadline}</p>
 
         <CtaButton label="LIHAT KATALOG" onClick={handleCtaClick} />
-
-        {!cancelled && autoEnterSeconds > 0 && (
-          <p className="countdown">
-            Masuk katalog otomatis dalam {remaining} detik.{' '}
-            <button
-              type="button"
-              className="countdown__cancel"
-              onClick={() => {
-                setCancelled(true);
-              }}
-            >
-              Batalkan
-            </button>
-          </p>
-        )}
 
         <p className="note">Gratis • Tanpa registrasi</p>
 

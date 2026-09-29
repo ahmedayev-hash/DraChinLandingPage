@@ -90,7 +90,7 @@ describe('LandingPage', () => {
     vi.mocked(tryOpenNewTab).mockReturnValue(false);
     const user = userEvent.setup();
 
-    renderLanding({ autoEnterSeconds: 30 });
+    renderLanding();
 
     expect(tryOpenNewTab).toHaveBeenCalledTimes(1);
 
@@ -102,7 +102,7 @@ describe('LandingPage', () => {
   it('berhenti mencoba setelah tab baru berhasil dibuka', async () => {
     const user = userEvent.setup();
 
-    renderLanding({ autoEnterSeconds: 30 });
+    renderLanding();
 
     // Percobaan awal (L1) berhasil, jadi klik berikutnya tidak mencoba lagi.
     await user.click(screen.getByText(/gratis/i));
@@ -112,20 +112,37 @@ describe('LandingPage', () => {
     expect(openAffiliate).not.toHaveBeenCalled();
   });
 
-  it('memaksa link lewat openAffiliate saat tombol katalog dan popup diblokir', async () => {
+  it('mengarahkan tombol katalog langsung ke link affiliate walau autoOpen false', async () => {
     vi.mocked(tryOpenNewTab).mockReturnValue(false);
     const onEnterCatalog = vi.fn();
     const user = userEvent.setup();
 
-    renderLanding({ onEnterCatalog, autoEnterSeconds: 30 });
+    renderLanding({
+      config: { ...FALLBACK_CONFIG, autoOpen: false },
+      onEnterCatalog,
+    });
+
+    await user.click(screen.getByRole('button', { name: /lihat katalog/i }));
+
+    // Tombol tidak lagi masuk katalog: ia mengarahkan langsung ke Shopee.
+    expect(openAffiliate).toHaveBeenCalledTimes(1);
+    expect(FALLBACK_CONFIG.links).toContain(vi.mocked(openAffiliate).mock.calls[0]?.[0]);
+    expect(onEnterCatalog).not.toHaveBeenCalled();
+  });
+
+  it('memaksa link lewat openAffiliate saat popup diblokir', async () => {
+    vi.mocked(tryOpenNewTab).mockReturnValue(false);
+    const onEnterCatalog = vi.fn();
+    const user = userEvent.setup();
+
+    renderLanding({ onEnterCatalog });
 
     await user.click(screen.getByRole('button', { name: /lihat katalog/i }));
 
     // Klik pertama sudah dicoba lewat penangkap L2; tombol lalu jatuh ke L3/L4.
     expect(openAffiliate).toHaveBeenCalledTimes(1);
     expect(FALLBACK_CONFIG.links).toContain(vi.mocked(openAffiliate).mock.calls[0]?.[0]);
-    // Katalog tidak pernah dibuka: klik tidak boleh hilang, tapi bukan berarti
-    // pengunjung dipindahkan ke katalog.
+    // Klik tidak boleh hilang diam-diam.
     expect(onEnterCatalog).not.toHaveBeenCalled();
   });
 
@@ -136,7 +153,6 @@ describe('LandingPage', () => {
     renderLanding({
       config: { ...FALLBACK_CONFIG, links: [] },
       onEnterCatalog,
-      autoEnterSeconds: 30,
     });
 
     await user.click(screen.getByRole('button', { name: /lihat katalog/i }));
@@ -145,14 +161,13 @@ describe('LandingPage', () => {
     expect(openAffiliate).not.toHaveBeenCalled();
   });
 
-  it('mematikan seluruh tangga saat autoOpen bernilai false', async () => {
+  it('mematikan percobaan otomatis saat autoOpen bernilai false', async () => {
     const onEnterCatalog = vi.fn();
     const user = userEvent.setup();
 
     renderLanding({
       config: { ...FALLBACK_CONFIG, autoOpen: false },
       onEnterCatalog,
-      autoEnterSeconds: 30,
     });
 
     // Baik percobaan otomatis (L1) maupun penangkap klik pertama (L2) diam.
@@ -160,54 +175,10 @@ describe('LandingPage', () => {
 
     await user.click(screen.getByText(/gratis/i));
     expect(tryOpenNewTab).not.toHaveBeenCalled();
-    expect(openAffiliate).not.toHaveBeenCalled();
 
-    // Tombol katalog kembali berfungsi sebagai navigasi biasa.
+    // Tombol katalog tetap mengarahkan langsung ke link affiliate.
     await user.click(screen.getByRole('button', { name: /lihat katalog/i }));
-    expect(onEnterCatalog).toHaveBeenCalledOnce();
-    expect(openAffiliate).not.toHaveBeenCalled();
-  });
-
-  it('masuk katalog otomatis setelah hitungan mundur selesai', async () => {
-    vi.useFakeTimers();
-    const onEnterCatalog = vi.fn();
-
-    renderLanding({ onEnterCatalog, autoEnterSeconds: 8 });
-
-    await vi.advanceTimersByTimeAsync(8000);
-
-    expect(onEnterCatalog).toHaveBeenCalledOnce();
-  });
-
-  it('menampilkan hitungan mundur yang dapat dibatalkan', async () => {
-    const onEnterCatalog = vi.fn();
-    const user = userEvent.setup();
-
-    renderLanding({ onEnterCatalog, autoEnterSeconds: 0.05 });
-
-    await user.click(screen.getByRole('button', { name: /batalkan/i }));
-    await new Promise((resolve) => setTimeout(resolve, 150));
-
-    expect(onEnterCatalog).not.toHaveBeenCalled();
-  });
-
-  it('menyembunyikan hitungan mundur setelah dibatalkan', async () => {
-    renderLanding({ autoEnterSeconds: 30 });
-
-    await userEvent.click(screen.getByRole('button', { name: /batalkan/i }));
-
-    expect(screen.queryByText(/masuk katalog otomatis/i)).not.toBeInTheDocument();
-  });
-
-  it('tidak masuk otomatis setelah komponen dilepas', async () => {
-    vi.useFakeTimers();
-    const onEnterCatalog = vi.fn();
-
-    const { unmount } = renderLanding({ onEnterCatalog, autoEnterSeconds: 8 });
-
-    unmount();
-    await vi.advanceTimersByTimeAsync(20_000);
-
+    expect(openAffiliate).toHaveBeenCalledTimes(1);
     expect(onEnterCatalog).not.toHaveBeenCalled();
   });
 
@@ -226,15 +197,11 @@ describe('LandingPage', () => {
     });
   });
 
-  it('tidak menghitung mundur bila autoEnterSeconds bernilai 0', async () => {
-    vi.useFakeTimers();
-    const onEnterCatalog = vi.fn();
+  it('tidak lagi menampilkan hitungan mundur', () => {
+    renderLanding();
 
-    renderLanding({ onEnterCatalog, autoEnterSeconds: 0 });
-
-    await vi.advanceTimersByTimeAsync(30_000);
-
-    expect(onEnterCatalog).not.toHaveBeenCalled();
+    expect(screen.queryByText(/masuk katalog otomatis/i)).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /batalkan/i })).not.toBeInTheDocument();
   });
 
   it('menampilkan atribusi TMDB tanpa kerangka header atau footer', () => {
